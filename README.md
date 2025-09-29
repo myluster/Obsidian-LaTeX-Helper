@@ -31,8 +31,6 @@ This plugin provides a feature-rich panel that integrates seamlessly into your O
 
 ### 🖼️ Screenshot
 
-*It is highly recommended to add a GIF or screenshot here demonstrating the plugin in action.*
-
 ![Plugin Demo](LaTex-Helper-shot.gif)
 
 
@@ -62,7 +60,5 @@ This plugin provides a feature-rich panel that integrates seamlessly into your O
 6.  如需切换语言，请进入 `设置` -> `LaTeX 助手`，在下拉菜单中选择您偏好的语言，面板将自动刷新。
 
 ### 🖼️ 截图演示
-
-*（强烈建议在此处添加一张展示插件实际运行效果的 GIF 动图或截图）*
 
 ![插件演示](LaTex-Helper-shot.gif)
