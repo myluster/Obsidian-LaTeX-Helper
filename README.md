@@ -31,7 +31,7 @@ This plugin provides a feature-rich panel that integrates seamlessly into your O
 
 ### 🖼️ Screenshot
 
-![Plugin Demo](LaTex-Helper-shot.gif)
+![Plugin Demo](LaTeX-Helper-shot.gif)
 
 
 ---
@@ -61,4 +61,4 @@ This plugin provides a feature-rich panel that integrates seamlessly into your O
 
 ### 🖼️ 截图演示
 
-![插件演示](LaTex-Helper-shot.gif)
+![插件演示](LaTeX-Helper-shot.gif)
