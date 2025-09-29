@@ -30,8 +30,7 @@ This plugin provides a feature-rich panel that integrates seamlessly into your O
 6.  To change the language, go to `Settings` -> `LaTeX Helper` and select your preferred language from the dropdown. The panel will refresh automatically.
 
 ### 🖼️ Screenshot
-
-![Plugin Demo](LaTeX-Helper-shot.gif)
+![LaTex-Helper-shot](https://github.com/user-attachments/assets/e43a32e5-cc92-40ee-9757-df253fee9d66)
 
 
 ---
@@ -60,5 +59,4 @@ This plugin provides a feature-rich panel that integrates seamlessly into your O
 6.  如需切换语言，请进入 `设置` -> `LaTeX 助手`，在下拉菜单中选择您偏好的语言，面板将自动刷新。
 
 ### 🖼️ 截图演示
-
-![插件演示](LaTeX-Helper-shot.gif)
+![LaTex-Helper-shot](https://github.com/user-attachments/assets/e43a32e5-cc92-40ee-9757-df253fee9d66)
