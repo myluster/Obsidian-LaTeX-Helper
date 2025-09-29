@@ -63,6 +63,8 @@ export class MyView extends ItemView {
 
         if (editor) {
             editor.replaceSelection(textToInsert);
+            //将操作焦点交还给编辑器
+            editor.focus();
         } else {
             // 如果所有方法都失败了，给出一个错误提示
             console.error("未能找到任何可以写入的笔记编辑器。");
