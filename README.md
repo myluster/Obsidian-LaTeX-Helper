@@ -1,94 +1,68 @@
-# Obsidian Sample Plugin
+# LaTeX Helper | LaTeX 助手
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+A powerful and convenient LaTeX symbol panel for Obsidian to enhance your mathematical and scientific note-taking efficiency.
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+This plugin provides a feature-rich panel that integrates seamlessly into your Obsidian workspace, helping you find and insert complex LaTeX symbols and snippets with ease.
 
-## First time developing plugins?
+---
 
-Quick starting guide for new plugin devs:
+## English
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+### ✨ Features
 
-## Releasing new releases
+-   **Comprehensive Symbol Library**: A clean, dropdown-based UI with a vast collection of LaTeX symbols across multiple categories (Greek, Operators, Arrows, etc.).
+-   **Real-time Search**: Instantly find the symbol you need by searching its LaTeX code within the currently selected category.
+-   **Seamless Window Management**: Easily switch between a docked sidebar panel and a floating pop-out window using a smart, context-aware button.
+-   **Multi-language Support**: A fully translated interface that supports both **English** and **Chinese**, which can be configured in the plugin's settings.
+-   **Smart Editing Workflow**:
+    -   Automatically adds a space after inserting a symbol to improve readability and speed.
+    -   Reliably returns the cursor focus to the editor after insertion, ensuring an uninterrupted writing flow.
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+### 🚀 How to Use
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+1.  After installing the plugin, click the **Sigma (Σ) icon** in the left ribbon to open the LaTeX Helper panel in the sidebar.
+2.  Use the **dropdown menu** at the top of the panel to switch between symbol categories.
+3.  Use the **search bar** to filter symbols in the current category by their LaTeX code (e.g., type `alpha` to find `\alpha`).
+4.  Click any symbol button to insert it directly into your active note.
+5.  Click the **pop-out/dock icon** next to the search bar to toggle the panel between the sidebar and a floating window.
+6.  To change the language, go to `Settings` -> `LaTeX Helper` and select your preferred language from the dropdown. The panel will refresh automatically.
 
-## Adding your plugin to the community plugin list
+### 🖼️ Screenshot
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+*It is highly recommended to add a GIF or screenshot here demonstrating the plugin in action.*
 
-## How to use
+![Plugin Demo](LaTex-Helper-shot.gif)
 
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
 
-## Manually installing the plugin
+---
+---
+---
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+## 中文
 
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint ./src/`
+### ✨ 功能特性
 
-## Funding URL
+-   **全面的符号库**：一个界面整洁、基于下拉菜单的符号面板，包含了多个分类下（希腊字母、运算符、箭头等）的大量常用 LaTeX 符号。
+-   **实时搜索**：在当前分类下，通过输入符号的 LaTeX 代码来即时查找您需要的符号。
+-   **无缝窗口管理**：通过一个智能的、能感知上下文的按钮，轻松地在侧边栏停靠模式和独立的浮动窗口模式之间切换。
+-   **多语言支持**：完全翻译的用户界面，支持**中文**和**英文**，并可在插件设置中自由切换。
+-   **智能编辑工作流**：
+    -   插入符号后自动添加空格，提高可读性与输入速度。
+    -   插入操作后，可靠地将光标焦点返回至编辑器，确保您的写作流程不被打断。
 
-You can include funding URLs where people who use your plugin can financially support it.
+### 🚀 如何使用
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+1.  安装插件后，点击 Obsidian 左侧功能区的 **Sigma (Σ) 图标**，即可在侧边栏打开 LaTeX 助手面板。
+2.  使用面板顶部的**下拉菜单**来切换不同的符号分类。
+3.  使用**搜索框**，通过输入 LaTeX 代码来筛选当前分类下的符号（例如，输入 `alpha` 来查找 `\alpha`）。
+4.  点击任意符号按钮，即可将其插入到您当前正在编辑的笔记中。
+5.  点击搜索框旁边的**弹出/停靠图标**，可以在侧边栏模式和浮动窗口模式之间切换面板。
+6.  如需切换语言，请进入 `设置` -> `LaTeX 助手`，在下拉菜单中选择您偏好的语言，面板将自动刷新。
 
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
-```
+### 🖼️ 截图演示
 
-If you have multiple URLs, you can also do:
+*（强烈建议在此处添加一张展示插件实际运行效果的 GIF 动图或截图）*
 
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
-
-## API Documentation
-
-See https://github.com/obsidianmd/obsidian-api
+![插件演示](LaTex-Helper-shot.gif)
