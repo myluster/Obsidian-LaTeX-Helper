@@ -1,23 +1,57 @@
 /* styles.css */
 
-.latex-tab-container {
+/* 主控制区，现在是垂直堆叠布局 */
+.latex-controls-container {
     display: flex;
+    flex-direction: column; /* 垂直排列 */
+    gap: 8px; /* 行间距 */
+    padding: 8px 10px;
     border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.latex-tab-button {
-    padding: 8px 12px;
-    border: none;
+/* 新的第一行容器，用于水平排列按钮和搜索框 */
+.latex-top-row {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 按钮和搜索框的间距 */
+}
+
+/* 动作按钮样式（弹出/停靠） */
+.latex-action-button {
+    flex-shrink: 0; /* 防止按钮被压缩 */
     background-color: transparent;
+    border: none;
     cursor: pointer;
-    border-bottom: 2px solid transparent;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+    border-radius: 4px;
+}
+.latex-action-button:hover {
+    opacity: 1;
+    background-color: var(--background-modifier-hover);
 }
 
-.latex-tab-button.is-active {
-    border-bottom: 2px solid var(--interactive-accent);
-    color: var(--interactive-accent);
+/* 搜索框占据第一行的剩余空间 */
+.latex-search-input {
+    flex-grow: 1;
+    padding: 6px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--background-modifier-border);
 }
 
+/* 下拉菜单占据第二行的全部宽度 */
+.latex-category-select {
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--background-modifier-border);
+    cursor: pointer;
+}
+
+/* 符号网格和按钮样式保持不变 */
 .latex-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
@@ -37,41 +71,5 @@
 }
 
 .latex-symbol-button:hover {
-    background-color: var(--background-modifier-hover);
-}
-
-.latex-search-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-}
-
-.latex-search-input {
-    flex-grow: 1;
-    width: 100%;
-    padding: 6px 8px;
-    border-radius: 4px;
-    border: 1px solid var(--background-modifier-border);
-    background-color: var(--background-primary);
-    color: var(--text-normal);
-}
-
-.latex-action-button {
-    flex-shrink: 0;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.6;
-    border-radius: 4px;
-}
-
-/* 核心样式修正：将 hover 效果应用到正确的类名上 */
-.latex-action-button:hover {
-    opacity: 1;
     background-color: var(--background-modifier-hover);
 }
