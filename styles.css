@@ -27,6 +27,19 @@
     padding: 10px;
 }
 
+.latex-search-container {
+    padding: 8px 10px;
+}
+
+.latex-search-input {
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--background-modifier-border);
+    background-color: var(--background-primary);
+    color: var(--text-normal);
+}
+
 .latex-symbol-button {
     padding: 8px;
     border-radius: 4px;
