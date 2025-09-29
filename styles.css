@@ -1,25 +1,23 @@
-/* 标签页容器 */
+/* styles.css */
+
 .latex-tab-container {
     display: flex;
     border-bottom: 1px solid var(--background-modifier-border);
 }
 
-/* 标签按钮 */
 .latex-tab-button {
     padding: 8px 12px;
     border: none;
     background-color: transparent;
     cursor: pointer;
-    border-bottom: 2px solid transparent; /* 默认无下划线 */
+    border-bottom: 2px solid transparent;
 }
 
-/* 激活状态的标签按钮 */
 .latex-tab-button.is-active {
     border-bottom: 2px solid var(--interactive-accent);
     color: var(--interactive-accent);
 }
 
-/* 符号网格 */
 .latex-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
@@ -27,11 +25,30 @@
     padding: 10px;
 }
 
+.latex-symbol-button {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid var(--background-modifier-border);
+    cursor: pointer;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.latex-symbol-button:hover {
+    background-color: var(--background-modifier-hover);
+}
+
 .latex-search-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     padding: 8px 10px;
 }
 
 .latex-search-input {
+    flex-grow: 1;
     width: 100%;
     padding: 6px 8px;
     border-radius: 4px;
@@ -40,17 +57,21 @@
     color: var(--text-normal);
 }
 
-.latex-symbol-button {
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid var(--background-modifier-border);
+.latex-action-button {
+    flex-shrink: 0;
+    background-color: transparent;
+    border: none;
     cursor: pointer;
-    min-height: 40px; /* 给渲染留出空间 */
+    padding: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
+    opacity: 0.6;
+    border-radius: 4px;
 }
 
-.latex-symbol-button:hover {
+/* 核心样式修正：将 hover 效果应用到正确的类名上 */
+.latex-action-button:hover {
+    opacity: 1;
     background-color: var(--background-modifier-hover);
 }
