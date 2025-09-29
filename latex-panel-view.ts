@@ -1,22 +1,34 @@
-// latex-panel-view.ts
-
-import { ItemView, WorkspaceLeaf, MarkdownView, Editor, MarkdownRenderer, setIcon } from "obsidian";
+import { ItemView, WorkspaceLeaf, MarkdownView, Editor, MarkdownRenderer, setIcon, WorkspaceWindow } from "obsidian";
 import { symbolCategories } from './symbols';
+import { translations } from './lang';
+import MyPlugin from "./main"; // 导入插件主类
 
 export const MY_VIEW_TYPE = "latex-panel-view";
 
 export class MyView extends ItemView {
+    private plugin: MyPlugin; // 存储插件实例
     private currentTab: string;
     private searchTerm: string;
 
-    constructor(leaf: WorkspaceLeaf) {
+    // 接收插件实例
+    constructor(leaf: WorkspaceLeaf, plugin: MyPlugin) {
         super(leaf);
+        this.plugin = plugin;
         this.currentTab = Object.keys(symbolCategories)[0] || '';
         this.searchTerm = '';
     }
 
+    // 翻译辅助函数
+    t(key: keyof typeof translations['en']): string {
+        const lang = this.plugin.settings.language;
+        return translations[lang][key] || translations['en'][key];
+    }
+
     getViewType(): string { return MY_VIEW_TYPE; }
-    getDisplayText(): string { return "LaTeX 片段"; }
+    
+    getDisplayText(): string { 
+        return this.plugin.settings ? this.t("view_title") : "LaTeX Snippets";
+    }
 
     async onOpen() {
         const container = this.contentEl;
@@ -28,24 +40,41 @@ export class MyView extends ItemView {
 
         const searchInput = searchContainer.createEl("input", {
             type: "text",
-            placeholder: "搜索符号代码...",
+            placeholder: this.t("search_placeholder"),
             cls: "latex-search-input"
         });
 
-        // --- 核心修改：移除所有判断，只保留创建“弹出”按钮的功能 ---
-        const popoutButton = searchContainer.createEl("button", { cls: "latex-action-button" });
-        setIcon(popoutButton, "popup-open");
-        popoutButton.ariaLabel = "在浮动窗口中打开";
+        const isPopout = this.leaf.getRoot() instanceof WorkspaceWindow;
         
-        popoutButton.addEventListener("click", async () => {
-            const newLeaf = this.app.workspace.openPopoutLeaf();
-            await newLeaf.setViewState({ type: MY_VIEW_TYPE, active: true });
-            this.leaf.detach(); // 关闭当前视图（无论是在侧边栏还是另一个浮动窗口）
-        });
+        if (isPopout) {
+            const dockButton = searchContainer.createEl("button", { cls: "latex-action-button" });
+            setIcon(dockButton, "panel-left-close");
+            dockButton.ariaLabel = this.t("dock_tooltip");
+            dockButton.addEventListener("click", async () => {
+                const rightLeaf = this.app.workspace.getRightLeaf(false);
+                if(rightLeaf) {
+                    await rightLeaf.setViewState({ type: MY_VIEW_TYPE, active: true });
+                    this.app.workspace.revealLeaf(rightLeaf);
+                    this.leaf.detach();
+                }
+            });
+        } else {
+            const popoutButton = searchContainer.createEl("button", { cls: "latex-action-button" });
+            setIcon(popoutButton, "popup-open");
+            popoutButton.ariaLabel = this.t("popout_tooltip");
+            popoutButton.addEventListener("click", async () => {
+                const newLeaf = this.app.workspace.openPopoutLeaf();
+                await newLeaf.setViewState({ type: MY_VIEW_TYPE, active: true });
+                this.leaf.detach();
+            });
+        }
 
         const categories = Object.keys(symbolCategories);
         categories.forEach(category => {
-            const tabButton = tabContainer.createEl("button", { text: category, cls: "latex-tab-button" });
+            const tabButton = tabContainer.createEl("button", { 
+                text: this.t(category as keyof typeof translations['en']), 
+                cls: "latex-tab-button" 
+            });
             tabButton.addEventListener("click", () => {
                 this.currentTab = category;
                 this.renderContent(tabContainer, contentContainer);
@@ -86,7 +115,7 @@ export class MyView extends ItemView {
     insertText(textToInsert: string) {
         const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
         if (activeView) {
-            activeView.editor.replaceSelection(textToInsert);
+            activeView.editor.replaceSelection(textToInsert+' ');
             activeView.editor.focus();
         } else {
             console.error("未能找到任何可以写入的笔记编辑器。");
