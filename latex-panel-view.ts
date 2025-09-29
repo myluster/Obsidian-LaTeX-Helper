@@ -1,18 +1,7 @@
-// 步骤 1: 在顶部的 import 语句中，加入 "Editor"
-import { ItemView, WorkspaceLeaf, MarkdownView, Editor } from "obsidian";
+import { ItemView, WorkspaceLeaf, MarkdownView, Editor, MarkdownRenderer } from "obsidian";
+import { symbolCategories } from './symbols';
 
-// 视图的唯一标识符
 export const MY_VIEW_TYPE = "latex-panel-view";
-
-// LaTex 符号定义
-const latexSymbols = [
-    { display: "α", code: "\\alpha" },
-    { display: "β", code: "\\beta" },
-    { display: "∑", code: "\\sum" },
-    { display: "→", code: "\\to" },
-    { display: "x²", code: "x^{2}" },
-    { display: "frac", code: "\\frac{}{}" },
-];
 
 export class MyView extends ItemView {
     constructor(leaf: WorkspaceLeaf) {
@@ -24,35 +13,71 @@ export class MyView extends ItemView {
     }
 
     getDisplayText(): string {
-        return "LaTeX Panel";
+        return "LaTeX 片段"; // 更新一下显示名称
     }
 
     async onOpen() {
         const container = this.containerEl.children[1];
         container.empty();
-        container.createEl("h4", { text: "LaTeX Symbols" });
 
-        const buttonContainer = container.createDiv({ cls: "latex-button-grid" });
+        // --- 开始构建标签页 UI ---
 
-        latexSymbols.forEach(symbol => {
-            const button = buttonContainer.createEl("button", { text: symbol.display });
+        // 1. 创建标签页按钮的容器
+        const tabContainer = container.createDiv({ cls: "latex-tab-container" });
+        // 2. 创建存放所有分类内容的容器
+        const contentContainer = container.createDiv({ cls: "latex-content-container" });
+
+        const categories = Object.keys(symbolCategories);
+        const contentDivs: { [key: string]: HTMLDivElement } = {};
+
+        // 3. 遍历分类，创建对应的标签按钮和内容区域
+        categories.forEach(category => {
+            // 创建标签按钮
+            const tabButton = tabContainer.createEl("button", { text: category, cls: "latex-tab-button" });
             
-            button.addEventListener("click", () => {
-                this.insertText(symbol.code);
+            // 创建该分类的内容 div
+            const contentDiv = contentContainer.createDiv({ cls: "latex-grid" });
+            contentDivs[category] = contentDiv;
+
+            // 为该分类下的每个符号创建按钮
+            symbolCategories[category as keyof typeof symbolCategories].forEach(symbol => {
+                const button = contentDiv.createEl("button");
+                button.addClass("latex-symbol-button");
+
+                // 使用 MarkdownRenderer 实时渲染 LaTeX 公式！
+                MarkdownRenderer.render(this.app, symbol.display, button, '', this);
+                
+                button.addEventListener("click", () => {
+                    this.insertText(symbol.code);
+                });
+            });
+
+            // 点击标签按钮时的切换逻辑
+            tabButton.addEventListener("click", () => {
+                // 移除所有按钮的激活状态
+                tabContainer.findAll(".latex-tab-button").forEach(btn => btn.removeClass("is-active"));
+                // 隐藏所有内容区域
+                Object.values(contentDivs).forEach(div => div.style.display = "none");
+
+                // 激活当前点击的按钮
+                tabButton.addClass("is-active");
+                // 显示当前分类的内容区域
+                contentDivs[category].style.display = "grid";
             });
         });
+
+        // 4. 默认激活第一个标签页
+        if (categories.length > 0) {
+            (tabContainer.firstChild as HTMLElement)?.click();
+        }
     }
 
     insertText(textToInsert: string) {
-        // 步骤 2: 在这里为 editor 变量添加明确的类型注解
         let editor: Editor | null = null;
-
-        // 方法1：首先尝试获取“活动”的 Markdown 视图
         const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
         if (activeView) {
             editor = activeView.editor;
         } else {
-            // 方法2 (备用方案)：如果方法1失败, 遍历所有窗口找到第一个笔记窗口
             this.app.workspace.iterateAllLeaves(leaf => {
                 if (editor) return; 
                 if (leaf.view instanceof MarkdownView) {
@@ -63,10 +88,8 @@ export class MyView extends ItemView {
 
         if (editor) {
             editor.replaceSelection(textToInsert);
-            //将操作焦点交还给编辑器
             editor.focus();
         } else {
-            // 如果所有方法都失败了，给出一个错误提示
             console.error("未能找到任何可以写入的笔记编辑器。");
         }
     }
