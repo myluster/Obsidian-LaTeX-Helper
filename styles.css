@@ -1,22 +1,23 @@
 /* styles.css */
 
-/* 主控制区，现在是垂直堆叠布局 */
+/* --- Main Control Area --- */
+/* --- 主要控制区 --- */
 .latex-controls-container {
     display: flex;
-    flex-direction: column; /* 垂直排列 */
+    flex-direction: column; /* 垂直堆叠 */
     gap: 8px; /* 行间距 */
     padding: 8px 10px;
     border-bottom: 1px solid var(--background-modifier-border);
 }
 
-/* 新的第一行容器，用于水平排列按钮和搜索框 */
+/* --- Top Row: Button and Search --- */
+/* --- 顶部行：按钮和搜索框 --- */
 .latex-top-row {
     display: flex;
     align-items: center;
-    gap: 8px; /* 按钮和搜索框的间距 */
+    gap: 8px; /* 元素间距 */
 }
 
-/* 动作按钮样式（弹出/停靠） */
 .latex-action-button {
     flex-shrink: 0; /* 防止按钮被压缩 */
     background-color: transparent;
@@ -34,26 +35,32 @@
     background-color: var(--background-modifier-hover);
 }
 
-/* 搜索框占据第一行的剩余空间 */
 .latex-search-input {
-    flex-grow: 1;
+    flex-grow: 1; /* 占据剩余空间 */
     padding: 6px 8px;
     border-radius: 4px;
     border: 1px solid var(--background-modifier-border);
 }
 
-/* 下拉菜单占据第二行的全部宽度 */
+/* --- Bottom Row: Category Select --- */
+/* --- 底部行：分类选择 --- */
 .latex-category-select {
-    width: 100%;
+    width: 100%; /* 占据整行宽度 */
     padding: 6px 8px;
     border-radius: 4px;
     border: 1px solid var(--background-modifier-border);
     cursor: pointer;
 }
 
-/* 符号网格和按钮样式保持不变 */
+/* --- Symbol Grid --- */
+/* --- 符号网格 --- */
+.latex-content-container {
+    /* 这个容器用于动态渲染符号 */
+}
+
 .latex-grid {
     display: grid;
+    /* 响应式网格布局，每列最小50px */
     grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
     gap: 5px;
     padding: 10px;
