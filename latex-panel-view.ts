@@ -5,24 +5,24 @@
 import { ItemView, WorkspaceLeaf, MarkdownView, Editor, MarkdownRenderer, setIcon, WorkspaceWindow } from "obsidian";
 import { symbolCategories } from './symbols';
 import { translations } from './lang';
-import MyPlugin from "./main";
+import LatexHelperPlugin from "./main";
 
 // 为我们的视图定义一个唯一的标识符
-// Define a unique identifier for our view.
-export const MY_VIEW_TYPE = "latex-panel-view";
+// Define a unique identifier for our view
+export const LATEX_HELPER_VIEW_TYPE = "latex-panel-view";
 
 // 视图的主类定义
 // The main class definition for our view.
-export class MyView extends ItemView {
+export class LatexHelperView extends ItemView {
     // 类的私有属性，用于存储状态
     // Private properties of the class to store its state.
-    private plugin: MyPlugin;
+    private plugin: LatexHelperPlugin;
     private currentCategory: string;
     private searchTerm: string;
 
     // 构造函数，在创建视图实例时调用
     // The constructor, called when a new view instance is created.
-    constructor(leaf: WorkspaceLeaf, plugin: MyPlugin) {
+    constructor(leaf: WorkspaceLeaf, plugin: LatexHelperPlugin) {
         super(leaf);
         this.plugin = plugin;
         this.currentCategory = Object.keys(symbolCategories)[0] || ''; // 默认选中第一个分类
@@ -38,7 +38,7 @@ export class MyView extends ItemView {
 
     // 返回视图的唯一标识符
     // Returns the view's unique identifier.
-    getViewType(): string { return MY_VIEW_TYPE; }
+    getViewType(): string { return LATEX_HELPER_VIEW_TYPE; }
     
     // 返回视图的显示标题
     // Returns the display title of the view.
@@ -138,14 +138,14 @@ export class MyView extends ItemView {
     // --- 视图动作的私有方法 ---
     private async popoutView() {
         const newLeaf = this.app.workspace.openPopoutLeaf();
-        await newLeaf.setViewState({ type: MY_VIEW_TYPE, active: true });
+        await newLeaf.setViewState({ type: LATEX_HELPER_VIEW_TYPE, active: true });
         this.leaf.detach();
     }
 
     private async dockView() {
         const rightLeaf = this.app.workspace.getRightLeaf(false);
         if(rightLeaf) {
-            await rightLeaf.setViewState({ type: MY_VIEW_TYPE, active: true });
+            await rightLeaf.setViewState({ type: LATEX_HELPER_VIEW_TYPE, active: true });
             this.app.workspace.revealLeaf(rightLeaf);
             this.leaf.detach();
         }
