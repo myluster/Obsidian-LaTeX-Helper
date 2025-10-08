@@ -15,6 +15,10 @@ export const translations = {
 		"standard_functions": "Standard Functions",
 		"letter_styles": "Letter Styles",
 		"misc": "Miscellaneous",
+		"edit_symbols_name": "Edit Symbols Configuration",
+		"edit_symbols_desc": "Open and edit the symbols.ts file to add custom LaTeX codes and category classifications.",
+		"edit_symbols_button": "Open symbols.ts",
+		"edit_symbols_error": "Failed to open symbols.ts file. Please open it manually from the plugin folder.",
 	},
 	zh: {
 		"view_title": "LaTeX 片段",
@@ -30,5 +34,9 @@ export const translations = {
 		"standard_functions": "标准函数",
 		"letter_styles": "字母样式",
 		"misc": "杂项",
+		"edit_symbols_name": "编辑符号配置",
+		"edit_symbols_desc": "打开并编辑 symbols.ts 文件以添加自定义 LaTeX 代码和分类。",
+		"edit_symbols_button": "打开 symbols.ts",
+		"edit_symbols_error": "无法打开 symbols.ts 文件。请从插件文件夹手动打开。",
 	}
 };

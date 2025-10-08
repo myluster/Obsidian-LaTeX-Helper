@@ -16,6 +16,7 @@ This plugin provides a feature-rich panel that integrates seamlessly into your O
 -   **Real-time Search**: Instantly find the symbol you need by searching its LaTeX code within the currently selected category.
 -   **Seamless Window Management**: Easily switch between a docked sidebar panel and a floating pop-out window using a smart, context-aware button.
 -   **Multi-language Support**: A fully translated interface that supports both **English** and **Chinese**, which can be configured in the plugin's settings.
+-   **Customizable Symbols**: Direct access to edit the symbols.ts configuration file from the settings interface, allowing you to add custom LaTeX codes and create custom category classifications.
 -   **Smart Editing Workflow**:
     -   Automatically adds a space after inserting a symbol to improve readability and speed.
     -   Reliably returns the cursor focus to the editor after insertion, ensuring an uninterrupted writing flow.
@@ -28,6 +29,7 @@ This plugin provides a feature-rich panel that integrates seamlessly into your O
 4.  Click any symbol button to insert it directly into your active note.
 5.  Click the **pop-out/dock icon** next to the search bar to toggle the panel between the sidebar and a floating window.
 6.  To change the language, go to `Settings` -> `LaTeX Helper` and select your preferred language from the dropdown. The panel will refresh automatically.
+7.  To customize symbols, go to `Settings` -> `LaTeX Helper` and click **"Open symbols.ts"** to directly edit the symbols configuration file. You can add custom LaTeX codes and category classifications.
 
 ### 🖼️ Screenshot
 ![LaTex-Helper-shot](https://github.com/user-attachments/assets/e43a32e5-cc92-40ee-9757-df253fee9d66)
@@ -45,6 +47,7 @@ This plugin provides a feature-rich panel that integrates seamlessly into your O
 -   **实时搜索**：在当前分类下，通过输入符号的 LaTeX 代码来即时查找您需要的符号。
 -   **无缝窗口管理**：通过一个智能的、能感知上下文的按钮，轻松地在侧边栏停靠模式和独立的浮动窗口模式之间切换。
 -   **多语言支持**：完全翻译的用户界面，支持**中文**和**英文**，并可在插件设置中自由切换。
+-   **可自定义符号**：可从设置界面直接访问并编辑 symbols.ts 配置文件，允许您添加自定义 LaTeX 代码和创建自定义分类。
 -   **智能编辑工作流**：
     -   插入符号后自动添加空格，提高可读性与输入速度。
     -   插入操作后，可靠地将光标焦点返回至编辑器，确保您的写作流程不被打断。
@@ -57,6 +60,7 @@ This plugin provides a feature-rich panel that integrates seamlessly into your O
 4.  点击任意符号按钮，即可将其插入到您当前正在编辑的笔记中。
 5.  点击搜索框旁边的**弹出/停靠图标**，可以在侧边栏模式和浮动窗口模式之间切换面板。
 6.  如需切换语言，请进入 `设置` -> `LaTeX 助手`，在下拉菜单中选择您偏好的语言，面板将自动刷新。
+7.  如需自定义符号，请进入 `设置` -> `LaTeX 助手`，点击**"打开 symbols.ts"**按钮，即可直接编辑符号配置文件。您可以添加自定义 LaTeX 代码和分类。
 
 ### 🖼️ 截图演示
 ![LaTex-Helper-shot](https://github.com/user-attachments/assets/e43a32e5-cc92-40ee-9757-df253fee9d66)

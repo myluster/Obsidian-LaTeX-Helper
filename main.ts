@@ -2,8 +2,9 @@
 
 // 导入 Obsidian API 的核心模块和我们自定义的视图文件
 // Import core modules from the Obsidian API and our custom view file
-import { App, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Plugin, PluginSettingTab, Setting, Notice } from 'obsidian';
 import { LatexHelperView, LATEX_HELPER_VIEW_TYPE } from './latex-panel-view';
+import { translations } from './lang';
 
 // 1. 定义插件设置的接口，确保类型安全
 // 1. Define the interface for our plugin settings for type safety.
@@ -101,6 +102,13 @@ class LatexHelperSettingTab extends PluginSettingTab {
         this.plugin = plugin;
     }
 
+    // 翻译辅助函数
+    // Helper function for translation.
+    t(key: keyof typeof translations['en']): string {
+        const lang = this.plugin.settings.language;
+        return translations[lang][key] || translations['en'][key];
+    }
+
     // `display` 方法用于构建设置页面的 UI
     // The `display` method builds the UI for the settings tab.
     display(): void {
@@ -121,6 +129,42 @@ class LatexHelperSettingTab extends PluginSettingTab {
                     this.plugin.settings.language = value; // 更新设置
                     await this.plugin.saveSettings(); // 保存设置
                     this.plugin.activateView(); // 重新激活视图以应用语言更改
+                }));
+
+        // 创建编辑符号配置的设置项
+        // Create a setting item to edit symbols configuration.
+        new Setting(containerEl)
+            .setName(this.t('edit_symbols_name'))
+            .setDesc(this.t('edit_symbols_desc'))
+            .addButton(button => button
+                .setButtonText(this.t('edit_symbols_button'))
+                .setCta()
+                .onClick(async () => {
+                    try {
+                        // 获取插件的基础路径
+                        // Get the plugin's base path.
+                        const adapter = this.app.vault.adapter;
+                        // @ts-ignore - accessing plugin manifest path
+                        const pluginDir = this.plugin.manifest.dir || '';
+                        const symbolsPath = `${pluginDir}/symbols.ts`;
+                        
+                        // 尝试打开文件
+                        // Try to open the file.
+                        const file = this.app.vault.getAbstractFileByPath(symbolsPath);
+                        if (file) {
+                            // 如果文件存在，在新标签页打开
+                            // If file exists, open it in a new tab.
+                            const leaf = this.app.workspace.getLeaf('tab');
+                            await leaf.openFile(file as any);
+                        } else {
+                            // 如果无法找到文件，显示错误信息和路径
+                            // If file cannot be found, show error with path.
+                            new Notice(this.t('edit_symbols_error') + '\n' + symbolsPath);
+                        }
+                    } catch (error) {
+                        console.error('Error opening symbols.ts:', error);
+                        new Notice(this.t('edit_symbols_error'));
+                    }
                 }));
     }
 }
