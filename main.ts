@@ -2,8 +2,9 @@
 
 // 导入 Obsidian API 的核心模块和我们自定义的视图文件
 // Import core modules from the Obsidian API and our custom view file
-import { App, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Plugin, PluginSettingTab, Setting, Notice} from 'obsidian';
 import { LatexHelperView, LATEX_HELPER_VIEW_TYPE } from './latex-panel-view';
+import { translations, TranslationKey } from './lang';
 
 // 1. 定义插件设置的接口，确保类型安全
 // 1. Define the interface for our plugin settings for type safety.
@@ -101,26 +102,53 @@ class LatexHelperSettingTab extends PluginSettingTab {
         this.plugin = plugin;
     }
 
+    private t(key: TranslationKey): string {
+        return translations[this.plugin.settings.language][key] || translations['en'][key];
+    }
+
+
     // `display` 方法用于构建设置页面的 UI
     // The `display` method builds the UI for the settings tab.
     display(): void {
-        const {containerEl} = this; // 获取容器元素
-        containerEl.empty(); // 清空，防止重复渲染
-        containerEl.createEl('h2', {text: 'LaTeX 助手设置'}); // 添加标题
+        const {containerEl} = this;
+        containerEl.empty();
+        containerEl.createEl('h2', {text: this.t('settings_title')});
 
-        // 创建一个新的设置项
-        // Create a new setting item.
         new Setting(containerEl)
-            .setName('语言 (Language)') // 设置项名称
-            .setDesc('选择插件界面的显示语言。') // 设置项描述
-            .addDropdown(dropdown => dropdown // 添加一个下拉菜单
+            .setName(this.t('language_setting'))
+            .setDesc(this.t('language_desc'))
+            .addDropdown(dropdown => dropdown
                 .addOption('zh', '中文')
                 .addOption('en', 'English')
-                .setValue(this.plugin.settings.language) // 设置当前值
-                .onChange(async (value: 'zh' | 'en') => { // 当值改变时
-                    this.plugin.settings.language = value; // 更新设置
-                    await this.plugin.saveSettings(); // 保存设置
-                    this.plugin.activateView(); // 重新激活视图以应用语言更改
+                .setValue(this.plugin.settings.language)
+                .onChange(async (value: 'zh' | 'en') => {
+                    this.plugin.settings.language = value;
+                    await this.plugin.saveSettings();
+                    // 重新渲染设置页面以更新语言
+                    this.display();
+                    this.plugin.activateView();
+                }));
+
+        new Setting(containerEl)
+            .setName(this.t('symbol_config'))
+            .setDesc(this.t('symbol_config_desc'))
+            .addButton(button => button
+                .setButtonText(this.t('open_config_button'))
+                .onClick(async () => {
+                    try {
+                        const path = require('path');
+                        const electron = require('electron');
+                        const { shell } = electron;
+                        
+                        // @ts-ignore - Obsidian's internal API
+                        const vaultPath = this.app.vault.adapter.getFullPath('');
+                        const pluginPath = path.join(vaultPath, '.obsidian', 'plugins', 'Obsidian-LaTeX-Helper');
+                        
+                        await shell.openPath(pluginPath);
+                    } catch (error) {
+                        new Notice(this.t('config_error'));
+                        console.error('Failed to open plugin folder:', error);
+                    }
                 }));
     }
 }

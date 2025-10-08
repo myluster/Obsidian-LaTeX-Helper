@@ -1,82 +1,82 @@
-// latex-panel-view.ts
-
 // 导入所需模块
-// Import required modules.
 import { ItemView, WorkspaceLeaf, MarkdownView, Editor, MarkdownRenderer, setIcon, WorkspaceWindow } from "obsidian";
 import { symbolCategories } from './symbols';
 import { translations } from './lang';
 import LatexHelperPlugin from "./main";
 
-// 为我们的视图定义一个唯一的标识符
-// Define a unique identifier for our view
+// 为视图定义唯一标识符
 export const LATEX_HELPER_VIEW_TYPE = "latex-panel-view";
 
+// 类型定义
+interface SymbolDisplay {
+    en: string;
+    zh: string;
+}
+
+interface SymbolDefinition {
+    display: string | SymbolDisplay;
+    code: string;
+}
+
 // 视图的主类定义
-// The main class definition for our view.
 export class LatexHelperView extends ItemView {
-    // 类的私有属性，用于存储状态
-    // Private properties of the class to store its state.
     private plugin: LatexHelperPlugin;
     private currentCategory: string;
     private searchTerm: string;
 
-    // 构造函数，在创建视图实例时调用
-    // The constructor, called when a new view instance is created.
     constructor(leaf: WorkspaceLeaf, plugin: LatexHelperPlugin) {
         super(leaf);
         this.plugin = plugin;
-        this.currentCategory = Object.keys(symbolCategories)[0] || ''; // 默认选中第一个分类
+        this.currentCategory = Object.keys(symbolCategories)[0] || '';
         this.searchTerm = '';
     }
 
+    // 必须是 public，因为它实现了 ItemView 的公共方法
+    getViewType(): string {
+        return LATEX_HELPER_VIEW_TYPE;
+    }
+
+    // 必须是 public，因为它实现了 ItemView 的公共方法
+    getDisplayText(): string {
+        return this.plugin.settings ? this.t("view_title") : "LaTeX Snippets";
+    }
+
     // 翻译辅助函数
-    // Helper function for translation.
-    t(key: keyof typeof translations['en']): string {
+    private t(key: keyof typeof translations['en']): string {
         const lang = this.plugin.settings.language;
         return translations[lang][key] || translations['en'][key];
     }
 
-    // 返回视图的唯一标识符
-    // Returns the view's unique identifier.
-    getViewType(): string { return LATEX_HELPER_VIEW_TYPE; }
-    
-    // 返回视图的显示标题
-    // Returns the display title of the view.
-    getDisplayText(): string { 
-        return this.plugin.settings ? this.t("view_title") : "LaTeX Snippets";
+    // 获取显示文本的辅助函数
+    private getSymbolDisplayText(symbol: SymbolDefinition): string {
+        if (typeof symbol.display === 'string') {
+            return symbol.display;
+        } else {
+            const lang = this.plugin.settings.language;
+            return symbol.display[lang];
+        }
     }
 
-    // 当视图被打开时执行的核心方法
-    // The core method that runs when the view is opened.
+    // 必须是 public，因为它实现了 ItemView 的公共方法
     async onOpen() {
-        // 获取内容容器并清空
-        // Get the content container and clear it.
         const container = this.contentEl;
         container.empty();
-        
-        // 创建UI控件（搜索、按钮、下拉菜单）
-        // Create the UI controls (search, button, dropdown).
         this.setupControls(container);
-
-        // 渲染符号网格
-        // Render the symbol grid.
         this.renderSymbols(container);
     }
 
-    // 私有方法：构建所有控制UI元素
-    // Private method: builds all control UI elements.
     private setupControls(container: HTMLElement) {
         const controlsContainer = container.createDiv({ cls: "latex-controls-container" });
         const topRow = controlsContainer.createDiv({ cls: "latex-top-row" });
         
-        // --- 搜索框 ---
+        // 搜索框
         const searchInput = topRow.createEl("input", {
             type: "text",
             placeholder: this.t("search_placeholder"),
             cls: "latex-search-input"
         });
 
-        // --- 弹出/停靠按钮 ---
+        // 弹出/停靠按钮
         const isPopout = this.leaf.getRoot() instanceof WorkspaceWindow;
         const actionButton = topRow.createEl("button", { cls: "latex-action-button" });
 
@@ -90,7 +90,7 @@ export class LatexHelperView extends ItemView {
             actionButton.addEventListener("click", () => this.popoutView());
         }
         
-        // --- 分类选择下拉菜单 ---
+        // 分类选择下拉菜单
         const categorySelect = controlsContainer.createEl("select", { cls: "latex-category-select" });
         const categories = Object.keys(symbolCategories);
         categories.forEach(category => {
@@ -99,20 +99,18 @@ export class LatexHelperView extends ItemView {
             option.textContent = this.t(category as keyof typeof translations['en']);
         });
 
-        // --- 事件监听 ---
+        // 事件监听
         categorySelect.addEventListener("change", (e) => {
             this.currentCategory = (e.target as HTMLSelectElement).value;
-            this.renderSymbols(container); // 重新渲染符号
+            this.renderSymbols(container);
         });
 
         searchInput.addEventListener("input", (e) => {
             this.searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
-            this.renderSymbols(container); // 重新渲染符号
+            this.renderSymbols(container);
         });
     }
 
-    // 私有方法：渲染符号网格
-    // Private method: renders the grid of symbols.
     private renderSymbols(container: HTMLElement) {
         let contentContainer = container.querySelector(".latex-content-container");
         if (!contentContainer) {
@@ -129,13 +127,32 @@ export class LatexHelperView extends ItemView {
 
         const grid = contentContainer.createDiv({ cls: "latex-grid" });
         filteredSymbols.forEach(symbol => {
-            const button = grid.createEl("button", { cls: "latex-symbol-button" });
-            MarkdownRenderer.render(this.app, symbol.display, button, '', this);
-            button.addEventListener("click", () => { this.insertText(symbol.code); });
+            // 根据是否使用翻译添加不同的类名
+            const isTranslated = this.currentCategory === 'matrices' || this.currentCategory === 'environments';
+            const button = grid.createEl("button", { 
+                cls: `latex-symbol-button ${isTranslated ? 'latex-translated-button' : 'latex-formula-button'}`,
+                attr: {
+                    'data-category': this.currentCategory
+                }
+            });
+            
+            const displayText = this.getSymbolDisplayText(symbol);
+
+            if (isTranslated) {
+                // 对于翻译内容，创建一个文本容器
+                const textContainer = button.createDiv({ cls: 'latex-translated-text' });
+                textContainer.setText(displayText);
+            } else {
+                // 对于 LaTeX 公式，使用原有的渲染方式
+                MarkdownRenderer.render(this.app, displayText, button, '', this);
+            }
+
+            button.addEventListener("click", () => { 
+                this.insertText(symbol.code + ' ');
+            });
         });
     }
 
-    // --- 视图动作的私有方法 ---
     private async popoutView() {
         const newLeaf = this.app.workspace.openPopoutLeaf();
         await newLeaf.setViewState({ type: LATEX_HELPER_VIEW_TYPE, active: true });
@@ -151,16 +168,12 @@ export class LatexHelperView extends ItemView {
         }
     }
 
-    // 插入文本到编辑器的方法
-    // Method to insert text into the editor.
-    insertText(textToInsert: string) {
+    private insertText(textToInsert: string) {
         let editor: Editor | null = null;
         const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
         if (activeView) {
             editor = activeView.editor;
         } else {
-            // 如果没有激活的编辑器，就遍历查找一个
-            // If no editor is active, iterate to find one.
             this.app.workspace.iterateAllLeaves(leaf => {
                 if (editor) return;
                 if (leaf.view instanceof MarkdownView) {
@@ -170,14 +183,13 @@ export class LatexHelperView extends ItemView {
         }
 
         if (editor) {
-            editor.replaceSelection(textToInsert); // 插入文本
-            editor.focus(); // 将焦点交还给编辑器
-        } else {
-            console.error("未能找到任何可以写入的笔记编辑器。");
+            const cursor = editor.getCursor();
+            editor.replaceSelection(textToInsert);
+            editor.setCursor(cursor.line, cursor.ch + textToInsert.length);
+            editor.focus();
         }
     }
 
-    // 视图关闭时执行
-    // Runs when the view is closed.
+    // 必须是 public，因为它实现了 ItemView 的公共方法
     async onClose() {}
 }
