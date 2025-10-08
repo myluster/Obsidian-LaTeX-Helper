@@ -1,8 +1,8 @@
 {
 	"id": "latex-panel-helper",
 	"name": "LaTeX Panel Helper",
-	"version": "0.1.0",
-	"minAppVersion": "0.1.0",
+	"version": "0.1.1",
+	"minAppVersion": "0.1.1",
 	"description": "Provides a convenient panel with categorized LaTeX symbols, real-time search, and a pop-out window to enhance your mathematical note-taking efficiency!",
 	"author": "Luster",
 	"authorUrl": "https://github.com/myluster",
