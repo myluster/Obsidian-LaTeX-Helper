@@ -6,7 +6,7 @@ export type TranslationKey =
     | "letter_styles" | "misc" | "matrices" | "environments"
     | "settings_title" | "language_setting" | "language_desc"
     | "symbol_config" | "symbol_config_desc" | "open_config_button"
-    | "config_error";
+    | "config_error" | "config_opened" | "path_copied";
 
 export const translations: Record<'en' | 'zh', Record<TranslationKey, string>> = {
 	en: {
@@ -32,7 +32,9 @@ export const translations: Record<'en' | 'zh', Record<TranslationKey, string>> =
         "symbol_config": "Symbol Configuration",
         "symbol_config_desc": "Open the folder containing symbols.ts file to customize symbols and categories",
         "open_config_button": "Open Config Folder",
-        "config_error": "Failed to open config folder. Please make sure it exists and you have permission to access it."
+        "config_error": "Failed to open config folder. Please make sure it exists and you have permission to access it.",
+        "config_opened": "Config folder opened successfully!",
+        "path_copied": "Config folder path copied to clipboard. Please open it manually in your file explorer."
     },
 	zh: {
 		"view_title": "LaTeX 片段",
@@ -57,6 +59,8 @@ export const translations: Record<'en' | 'zh', Record<TranslationKey, string>> =
         "symbol_config": "符号配置",
         "symbol_config_desc": "打开 symbols.ts 文件所在文件夹以自定义符号和类别",
         "open_config_button": "打开配置文件夹",
-        "config_error": "无法打开配置文件夹。请确保文件夹存在且有权限访问。"
+        "config_error": "无法打开配置文件夹。请确保文件夹存在且有权限访问。",
+        "config_opened": "配置文件夹已成功打开！",
+        "path_copied": "配置文件夹路径已复制到剪贴板。请在文件浏览器中手动打开。"
 	}
 };
