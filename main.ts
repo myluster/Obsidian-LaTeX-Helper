@@ -44,7 +44,7 @@ export default class LatexHelperPlugin extends Plugin {
         // 在左侧功能区添加一个图标按钮，用于打开我们的视图
         // Add a ribbon icon to the left bar to open our view.
         this.addRibbonIcon("sigma", "打开 LaTeX 面板", () => {
-            this.activateView();
+            void this.activateView();
         });
 
         // 添加一个设置页面，让用户可以配置插件
@@ -112,7 +112,9 @@ class LatexHelperSettingTab extends PluginSettingTab {
     display(): void {
         const {containerEl} = this;
         containerEl.empty();
-        containerEl.createEl('h2', {text: this.t('settings_title')});
+        new Setting(containerEl)
+            .setHeading()
+            .setName(this.t('settings_title'));
 
         new Setting(containerEl)
             .setName(this.t('language_setting'))
@@ -126,7 +128,7 @@ class LatexHelperSettingTab extends PluginSettingTab {
                     await this.plugin.saveSettings();
                     // 重新渲染设置页面以更新语言
                     this.display();
-                    this.plugin.activateView();
+                    await this.plugin.activateView();
                 }));
 
         new Setting(containerEl)
@@ -136,19 +138,15 @@ class LatexHelperSettingTab extends PluginSettingTab {
                 .setButtonText(this.t('open_config_button'))
                 .onClick(async () => {
                     try {
-                        const path = require('path');
-                        const electron = require('electron');
-                        const { shell } = electron;
-                        
-                        // @ts-ignore - Obsidian's internal API
-                        const vaultPath = this.app.vault.adapter.getFullPath('');
-                        const pluginPath = path.join(vaultPath, '.obsidian', 'plugins', 'Obsidian-LaTeX-Helper');
-                        
+                        const pluginPath = `${this.app.vault.configDir}/plugins/Obsidian-LaTeX-Helper`;
+                        // eslint-disable-next-line @typescript-eslint/no-var-requires
+                        const { shell } = require('electron');
                         await shell.openPath(pluginPath);
                     } catch (error) {
                         new Notice(this.t('config_error'));
                         console.error('Failed to open plugin folder:', error);
                     }
-                }));
+                })
+            );
     }
 }

@@ -61,6 +61,7 @@ export class LatexHelperView extends ItemView {
     async onOpen() {
         const container = this.contentEl;
         container.empty();
+        await Promise.resolve();
         this.setupControls(container);
         this.renderSymbols(container);
     }
@@ -83,11 +84,15 @@ export class LatexHelperView extends ItemView {
         if (isPopout) {
             setIcon(actionButton, "panel-left-close");
             actionButton.ariaLabel = this.t("dock_tooltip");
-            actionButton.addEventListener("click", () => this.dockView());
+            actionButton.addEventListener("click", async () => {
+                await this.dockView();
+            });
         } else {
             setIcon(actionButton, "popup-open");
             actionButton.ariaLabel = this.t("popout_tooltip");
-            actionButton.addEventListener("click", () => this.popoutView());
+            actionButton.addEventListener("click", async () => {
+                await this.popoutView();
+            });
         }
         
         // 分类选择下拉菜单
