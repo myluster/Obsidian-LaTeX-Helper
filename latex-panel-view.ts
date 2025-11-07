@@ -168,8 +168,8 @@ export class LatexHelperView extends ItemView {
         const rightLeaf = this.app.workspace.getRightLeaf(false);
         if(rightLeaf) {
             await rightLeaf.setViewState({ type: LATEX_HELPER_VIEW_TYPE, active: true });
-            this.app.workspace.revealLeaf(rightLeaf);
-            await this.leaf.detach();
+            await this.app.workspace.revealLeaf(rightLeaf);
+            this.leaf.detach();
         }
     }
 
