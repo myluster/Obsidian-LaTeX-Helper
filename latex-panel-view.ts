@@ -84,14 +84,14 @@ export class LatexHelperView extends ItemView {
         if (isPopout) {
             setIcon(actionButton, "panel-left-close");
             actionButton.ariaLabel = this.t("dock_tooltip");
-            actionButton.addEventListener("click", async () => {
-                await this.dockView();
+            actionButton.addEventListener("click", () => {
+                void this.dockView();
             });
         } else {
             setIcon(actionButton, "popup-open");
             actionButton.ariaLabel = this.t("popout_tooltip");
-            actionButton.addEventListener("click", async () => {
-                await this.popoutView();
+            actionButton.addEventListener("click", () => {
+                void this.popoutView();
             });
         }
         
@@ -123,7 +123,7 @@ export class LatexHelperView extends ItemView {
         }
         contentContainer.empty();
 
-        const symbols = symbolCategories[this.currentCategory as keyof typeof symbolCategories];
+        const symbols = symbolCategories[this.currentCategory];
         if (!symbols) return;
 
         const filteredSymbols = symbols.filter(symbol => 
@@ -149,7 +149,7 @@ export class LatexHelperView extends ItemView {
                 textContainer.setText(displayText);
             } else {
                 // 对于 LaTeX 公式，使用原有的渲染方式
-                MarkdownRenderer.render(this.app, displayText, button, '', this);
+                void MarkdownRenderer.render(this.app, displayText, button, '', this);
             }
 
             button.addEventListener("click", () => { 
@@ -169,7 +169,7 @@ export class LatexHelperView extends ItemView {
         if(rightLeaf) {
             await rightLeaf.setViewState({ type: LATEX_HELPER_VIEW_TYPE, active: true });
             this.app.workspace.revealLeaf(rightLeaf);
-            this.leaf.detach();
+            await this.leaf.detach();
         }
     }
 

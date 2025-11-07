@@ -91,7 +91,7 @@ export default class LatexHelperPlugin extends Plugin {
             });
             // 确保侧边栏是展开并显示我们的视图的
             // Make sure the sidebar is revealed to show our view.
-            this.app.workspace.revealLeaf(leaf); 
+            await this.app.workspace.revealLeaf(leaf); 
         }
     }
 
@@ -166,7 +166,7 @@ class LatexHelperSettingTab extends PluginSettingTab {
             // 获取绝对路径
             // Get absolute path
             const absolutePath = this.getAbsolutePath(pluginPath);
-            console.log('Opening path:', absolutePath);
+            console.debug('Opening path:', absolutePath);
             
             // 在浏览器环境中动态加载electron模块
             // Dynamically load electron module in browser environment
