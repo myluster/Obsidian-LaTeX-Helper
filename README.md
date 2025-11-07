@@ -27,7 +27,6 @@ This plugin provides a feature-rich panel that integrates seamlessly into your O
 3.  Use the **search bar** to filter symbols in the current category by their LaTeX code (e.g., type `alpha` to find `\alpha`).
 4.  Click any symbol button to insert it directly into your active note.
 5.  Click the **pop-out/dock icon** next to the search bar to toggle the panel between the sidebar and a floating window.
-6.  To change the language, go to `Settings` -> `LaTeX Helper` and select your preferred language from the dropdown. The panel will refresh automatically.
 
 ### 🖼️ Screenshot
 ![LaTex-Helper-shot](https://github.com/user-attachments/assets/e43a32e5-cc92-40ee-9757-df253fee9d66)
@@ -56,7 +55,6 @@ This plugin provides a feature-rich panel that integrates seamlessly into your O
 3.  使用**搜索框**，通过输入 LaTeX 代码来筛选当前分类下的符号（例如，输入 `alpha` 来查找 `\alpha`）。
 4.  点击任意符号按钮，即可将其插入到您当前正在编辑的笔记中。
 5.  点击搜索框旁边的**弹出/停靠图标**，可以在侧边栏模式和浮动窗口模式之间切换面板。
-6.  如需切换语言，请进入 `设置` -> `LaTeX 助手`，在下拉菜单中选择您偏好的语言，面板将自动刷新。
 
 ### 🖼️ 截图演示
 ![LaTex-Helper-shot](https://github.com/user-attachments/assets/e43a32e5-cc92-40ee-9757-df253fee9d66)
