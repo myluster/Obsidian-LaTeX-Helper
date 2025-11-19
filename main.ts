@@ -1,16 +1,7 @@
-// main.ts
-import { App, Plugin, PluginSettingTab, Setting, WorkspaceLeaf, Notice, getLanguage } from 'obsidian';
+import { App, Plugin, PluginSettingTab, Setting, WorkspaceLeaf, Notice, Modal } from 'obsidian';
 import { LatexHelperView, LATEX_HELPER_VIEW_TYPE } from './latex-panel-view';
 import { DEFAULT_SYMBOLS, SymbolDefinition } from './symbols';
 import { translations, TranslationKey } from './lang';
-
-// 声明全局 window 扩展 (用于 moment)
-declare global {
-    interface Window {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        moment: any;
-    }
-}
 
 // 定义设置接口
 export interface LatexHelperSettings {
@@ -85,14 +76,50 @@ export default class LatexHelperPlugin extends Plugin {
     }
 
     onunload() {
-        this.app.workspace.detachLeavesOfType(LATEX_HELPER_VIEW_TYPE);
+        // Obsidian 会自动处理视图的挂载和卸载状态
     }
 }
 
-// 设置页：JSON 编辑器
+class ConfirmModal extends Modal {
+    private title: string;
+    private content: string;
+    private onConfirm: () => void;
+
+    constructor(app: App, title: string, content: string, onConfirm: () => void) {
+        super(app);
+        this.title = title;
+        this.content = content;
+        this.onConfirm = onConfirm;
+    }
+
+    onOpen() {
+        const { contentEl } = this;
+        contentEl.createEl('h2', { text: this.title });
+        contentEl.createDiv({ text: this.content });
+
+        const buttonContainer = contentEl.createDiv({ cls: 'modal-button-container' });
+
+        new Setting(buttonContainer)
+            .addButton(btn => btn
+                .setButtonText('Cancel')
+                .onClick(() => this.close()))
+            .addButton(btn => btn
+                .setButtonText('Confirm')
+                .setWarning()
+                .onClick(() => {
+                    this.onConfirm();
+                    this.close();
+                }));
+    }
+
+    onClose() {
+        const { contentEl } = this;
+        contentEl.empty();
+    }
+}
+
 class LatexHelperSettingTab extends PluginSettingTab {
     plugin: LatexHelperPlugin;
-    private currentLang: 'zh' | 'en' = 'en';
 
     constructor(app: App, plugin: LatexHelperPlugin) {
         super(app, plugin);
@@ -100,36 +127,26 @@ class LatexHelperSettingTab extends PluginSettingTab {
     }
 
     private t(key: TranslationKey): string {
-        return translations[this.currentLang][key] || translations['en'][key] || key;
-    }
-
-    private updateLanguage() {
-        let lang: string | null = null;
-        try { lang = getLanguage(); } catch (e) { /* ignore */ }
-        if (!lang && window.moment) lang = window.moment.locale();
-        if (!lang) lang = window.localStorage.getItem('language');
-        
-        if (lang && lang.toLowerCase().startsWith('zh')) {
-            this.currentLang = 'zh';
-        } else {
-            this.currentLang = 'en';
-        }
+        const lang = window.localStorage.getItem('language') || 'en';
+        const isZh = lang.toLowerCase().startsWith('zh');
+        const currentLang = isZh ? 'zh' : 'en';
+        return translations[currentLang][key] || translations['en'][key] || key;
     }
 
     display(): void {
-        this.updateLanguage();
-
         const {containerEl} = this;
         containerEl.empty();
 
-        containerEl.createEl('h2', {text: this.t('settings_title')});
+        new Setting(containerEl)
+            .setName(this.t('settings_title'))
+            .setHeading();
 
         new Setting(containerEl)
             .setName(this.t('settings_json_name'))
-            .setDesc(this.t('settings_json_desc'))
-            .setClass('latex-helper-json-setting');
+            .setDesc(this.t('settings_json_desc'));
 
-        const jsonTextArea = new Setting(containerEl)
+        new Setting(containerEl)
+            .setClass('latex-helper-json-textarea') 
             .addTextArea(text => text
                 .setPlaceholder('Paste your JSON here...')
                 .setValue(JSON.stringify(this.plugin.settings.symbols, null, 2))
@@ -142,12 +159,6 @@ class LatexHelperSettingTab extends PluginSettingTab {
                         console.warn(this.t('json_error'));
                     }
                 }));
-        
-        const textAreaEl = jsonTextArea.controlEl.querySelector('textarea');
-        if (textAreaEl) {
-            textAreaEl.style.height = '300px';
-            textAreaEl.style.width = '100%';
-        }
 
         new Setting(containerEl)
             .setName(this.t('settings_reset_name'))
@@ -155,13 +166,18 @@ class LatexHelperSettingTab extends PluginSettingTab {
             .addButton(button => button
                 .setButtonText(this.t('settings_reset_btn'))
                 .setWarning()
-                .onClick(async () => {
-                    if(confirm(this.t('settings_reset_confirm'))) {
-                        this.plugin.settings.symbols = DEFAULT_SYMBOLS;
-                        await this.plugin.saveSettings();
-                        this.display();
-                        new Notice(this.t('settings_reset_success'));
-                    }
+                .onClick(() => {
+                    new ConfirmModal(
+                        this.app, 
+                        this.t('settings_reset_name'),
+                        this.t('settings_reset_confirm'),
+                        async () => {
+                            this.plugin.settings.symbols = DEFAULT_SYMBOLS;
+                            await this.plugin.saveSettings();
+                            this.display();
+                            new Notice(this.t('settings_reset_success'));
+                        }
+                    ).open();
                 }));
     }
 }

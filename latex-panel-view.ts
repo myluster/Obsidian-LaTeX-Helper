@@ -1,30 +1,19 @@
-import { ItemView, WorkspaceLeaf, MarkdownView, MarkdownRenderer, setIcon, WorkspaceWindow, getLanguage } from "obsidian";
-// 移除对 symbolCategories 的直接引用，只引入类型
+import { ItemView, WorkspaceLeaf, MarkdownView, MarkdownRenderer, setIcon, WorkspaceWindow, getLanguage, moment } from "obsidian";
 import { SymbolDefinition } from './symbols';
 import { translations, TranslationKey } from './lang';
 import LatexHelperPlugin from "./main";
 
-declare global {
-    interface Window {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        moment: any;
-    }
-}
-
 export const LATEX_HELPER_VIEW_TYPE = "latex-panel-view";
 
 export class LatexHelperView extends ItemView {
-    // ✅ 添加 plugin 引用
     private plugin: LatexHelperPlugin;
     private currentCategory: string;
     private searchTerm: string;
     private currentLang: 'zh' | 'en' = 'en';
 
-    // ✅ 构造函数接收 plugin
     constructor(leaf: WorkspaceLeaf, plugin: LatexHelperPlugin) {
         super(leaf);
         this.plugin = plugin;
-        // 从设置中获取第一个分类
         this.currentCategory = Object.keys(this.plugin.settings.symbols)[0] || '';
         this.searchTerm = '';
     }
@@ -39,7 +28,6 @@ export class LatexHelperView extends ItemView {
 
     public refresh() {
         const container = this.contentEl;
-        // 如果当前分类被删除了，重置为第一个
         const categories = Object.keys(this.plugin.settings.symbols);
         if (!categories.includes(this.currentCategory)) {
             this.currentCategory = categories[0] || '';
@@ -47,13 +35,14 @@ export class LatexHelperView extends ItemView {
         this.renderSymbols(container);
     }
 
-
     private updateLanguage() {
-        // ... 保持原样 ...
         let lang: string | null = null;
-        try { lang = getLanguage(); } catch (e) { /* ignore */ }
-        if (!lang && window.moment) { lang = window.moment.locale(); }
+        
+        try { lang = getLanguage(); } catch { /* ignore */ }
+        
+        if (!lang && moment) { lang = moment.locale(); }
         if (!lang) { lang = window.localStorage.getItem('language'); }
+        
         if (lang && lang.toLowerCase().startsWith('zh')) { this.currentLang = 'zh'; } 
         else { this.currentLang = 'en'; }
     }
@@ -95,8 +84,10 @@ export class LatexHelperView extends ItemView {
         const icon = isPopout ? "panel-left-close" : "popup-open";
         const tooltip = isPopout ? this.t("dock_tooltip") : this.t("popout_tooltip");
         const action = isPopout ? () => this.dockView() : () => this.popoutView();
+        
         setIcon(actionButton, icon);
         actionButton.ariaLabel = tooltip;
+        
         actionButton.addEventListener("mousedown", (e) => {
             e.preventDefault();
             void action();
@@ -108,7 +99,6 @@ export class LatexHelperView extends ItemView {
         categories.forEach(category => {
             const option = categorySelect.createEl("option");
             option.value = category;
-            // 这里需要注意：如果是用户自定义的新分类，翻译文件中没有 key，就直接显示 key 本身
             option.textContent = this.t(category as TranslationKey); 
         });
 
@@ -117,7 +107,6 @@ export class LatexHelperView extends ItemView {
             this.renderSymbols(container);
         });
         
-        // 确保下拉框选中当前分类
         categorySelect.value = this.currentCategory;
 
         searchInput.addEventListener("input", (e) => {
@@ -166,7 +155,6 @@ export class LatexHelperView extends ItemView {
             });
         });
     }
-
 
     private async popoutView() {
         const newLeaf = this.app.workspace.openPopoutLeaf();

@@ -105,6 +105,13 @@
     word-break: break-word;
 }
 
+.latex-helper-json-textarea textarea {
+    height: 300px;
+    width: 100%;
+    font-family: var(--font-monospace);
+    font-size: var(--font-ui-smaller);
+}
+
 /* 响应式调整 */
 @media (min-width: 400px) {
     .latex-grid {
