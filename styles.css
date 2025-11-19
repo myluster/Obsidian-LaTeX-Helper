@@ -50,6 +50,8 @@
     border-radius: 4px;
     border: 1px solid var(--background-modifier-border);
     cursor: pointer;
+
+    text-align: center;
 }
 
 /* --- Symbol Grid --- */

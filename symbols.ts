@@ -1,15 +1,15 @@
 // symbols.ts
-interface SymbolDisplay {
+export interface SymbolDisplay {
     en: string;
     zh: string;
 }
 
-interface SymbolDefinition {
+export interface SymbolDefinition {
     display: string | SymbolDisplay;
     code: string;
 }
 
-export const symbolCategories: Record<string, SymbolDefinition[]> = {
+export const DEFAULT_SYMBOLS: Record<string, SymbolDefinition[]> = {
     "greek_letters": [
         // Lowercase
         { display: "$\\alpha$", code: "\\alpha" }, { display: "$\\beta$", code: "\\beta" }, { display: "$\\gamma$", code: "\\gamma" }, { display: "$\\delta$", code: "\\delta" }, { display: "$\\epsilon$", code: "\\epsilon" }, { display: "$\\zeta$", code: "\\zeta" }, { display: "$\\eta$", code: "\\eta" }, { display: "$\\theta$", code: "\\theta" }, { display: "$\\iota$", code: "\\iota" }, { display: "$\\kappa$", code: "\\kappa" }, { display: "$\\lambda$", code: "\\lambda" }, { display: "$\\mu$", code: "\\mu" }, { display: "$\\nu$", code: "\\nu" }, { display: "$\\xi$", code: "\\xi" }, { display: "$\\omicron$", code: "\\omicron" }, { display: "$\\pi$", code: "\\pi" }, { display: "$\\rho$", code: "\\rho" }, { display: "$\\sigma$", code: "\\sigma" }, { display: "$\\tau$", code: "\\tau" }, { display: "$\\upsilon$", code: "\\upsilon" }, { display: "$\\phi$", code: "\\phi" }, { display: "$\\chi$", code: "\\chi" }, { display: "$\\psi$", code: "\\psi" }, { display: "$\\omega$", code: "\\omega" },
@@ -104,35 +104,35 @@ export const symbolCategories: Record<string, SymbolDefinition[]> = {
      "matrices": [
         { 
             display: {
-                en: "Basic Matrix",
+                en: "Basic matrix",
                 zh: "基础矩阵"
             }, 
             code: "\\begin{matrix}\na & b \\\\\nc & d\n\\end{matrix}"
         },
         { 
             display: {
-                en: "Parentheses Matrix",
+                en: "Parentheses matrix",
                 zh: "小括号矩阵"
             }, 
             code: "\\begin{pmatrix}\na & b \\\\\nc & d\n\\end{pmatrix}"
         },
         { 
             display: {
-                en: "Bracket Matrix",
+                en: "Bracket matrix",
                 zh: "中括号矩阵"
             }, 
             code: "\\begin{bmatrix}\na & b \\\\\nc & d\n\\end{bmatrix}"
         },
         { 
             display: {
-                en: "Single Line Matrix",
+                en: "Single line matrix",
                 zh: "单竖线矩阵"
             }, 
             code: "\\begin{vmatrix}\na & b \\\\\nc & d\n\\end{vmatrix}"
         },
         { 
             display: {
-                en: "Double Line Matrix",
+                en: "Double line matrix",
                 zh: "双竖线矩阵"
             }, 
             code: "\\begin{Vmatrix}\na & b \\\\\nc & d\n\\end{Vmatrix}"

@@ -4,9 +4,9 @@ export type TranslationKey =
     | "greek_letters" | "operators_and_relations" | "arrows" | "delimiters"
     | "maths_constructs" | "variable_sized_symbols" | "standard_functions"
     | "letter_styles" | "misc" | "matrices" | "environments"
-    | "settings_title" | "language_setting" | "language_desc"
-    | "symbol_config" | "symbol_config_desc" | "open_config_button"
-    | "config_error" | "config_opened" | "path_copied";
+    | "settings_title" | "settings_json_name" | "settings_json_desc" 
+    | "settings_reset_name" | "settings_reset_desc" | "settings_reset_btn" 
+    | "settings_reset_confirm" | "settings_reset_success" | "json_error";
 
 export const translations: Record<'en' | 'zh', Record<TranslationKey, string>> = {
 	en: {
@@ -25,16 +25,15 @@ export const translations: Record<'en' | 'zh', Record<TranslationKey, string>> =
 		"misc": "Miscellaneous",
 		"matrices": "Matrices",
         "environments": "Environments",
-
-		"settings_title": "LaTeX Helper Settings",
-        "language_setting": "Language",
-        "language_desc": "Choose the display language for the plugin interface.",
-        "symbol_config": "Symbol Configuration",
-        "symbol_config_desc": "Open the folder containing symbols.ts file to customize symbols and categories",
-        "open_config_button": "Open Config Folder",
-        "config_error": "Failed to open config folder. Please make sure it exists and you have permission to access it.",
-        "config_opened": "Config folder opened successfully!",
-        "path_copied": "Config folder path copied to clipboard. Please open it manually in your file explorer."
+        "settings_title": "LaTeX Helper Configuration",
+        "settings_json_name": "Symbol Configuration (JSON)",
+        "settings_json_desc": "Edit the JSON below to customize symbols. Be careful with the syntax!",
+        "settings_reset_name": "Reset to Defaults",
+        "settings_reset_desc": "Restore original symbol list. This will overwrite your changes.",
+        "settings_reset_btn": "Reset",
+        "settings_reset_confirm": "Are you sure you want to reset all symbols to default?",
+        "settings_reset_success": "Symbols reset to default.",
+        "json_error": "Invalid JSON syntax"
     },
 	zh: {
 		"view_title": "LaTeX 片段",
@@ -52,15 +51,14 @@ export const translations: Record<'en' | 'zh', Record<TranslationKey, string>> =
 		"misc": "杂项",
 		"matrices": "矩阵",
         "environments": "数学环境",
-
-		"settings_title": "LaTeX 助手设置",
-        "language_setting": "语言 (Language)",
-        "language_desc": "选择插件界面的显示语言。",
-        "symbol_config": "符号配置",
-        "symbol_config_desc": "打开 symbols.ts 文件所在文件夹以自定义符号和类别",
-        "open_config_button": "打开配置文件夹",
-        "config_error": "无法打开配置文件夹。请确保文件夹存在且有权限访问。",
-        "config_opened": "配置文件夹已成功打开！",
-        "path_copied": "配置文件夹路径已复制到剪贴板。请在文件浏览器中手动打开。"
+        "settings_title": "LaTeX 助手配置",
+        "settings_json_name": "符号配置 (JSON)",
+        "settings_json_desc": "在下方编辑 JSON 以自定义符号。请注意保持语法格式正确！",
+        "settings_reset_name": "重置为默认",
+        "settings_reset_desc": "恢复初始符号列表。这将覆盖您的所有更改。",
+        "settings_reset_btn": "重置",
+        "settings_reset_confirm": "确定要将所有符号重置为默认值吗？",
+        "settings_reset_success": "符号已重置为默认值。",
+        "json_error": "JSON 语法错误"
 	}
 };

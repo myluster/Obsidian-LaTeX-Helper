@@ -1,64 +1,77 @@
-// 导入所需模块
-import { ItemView, WorkspaceLeaf, MarkdownView, Editor, MarkdownRenderer, setIcon, WorkspaceWindow } from "obsidian";
-import { symbolCategories } from './symbols';
-import { translations } from './lang';
+import { ItemView, WorkspaceLeaf, MarkdownView, MarkdownRenderer, setIcon, WorkspaceWindow, getLanguage } from "obsidian";
+// 移除对 symbolCategories 的直接引用，只引入类型
+import { SymbolDefinition } from './symbols';
+import { translations, TranslationKey } from './lang';
 import LatexHelperPlugin from "./main";
 
-// 为视图定义唯一标识符
+declare global {
+    interface Window {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        moment: any;
+    }
+}
+
 export const LATEX_HELPER_VIEW_TYPE = "latex-panel-view";
 
-// 类型定义
-interface SymbolDisplay {
-    en: string;
-    zh: string;
-}
-
-interface SymbolDefinition {
-    display: string | SymbolDisplay;
-    code: string;
-}
-
-// 视图的主类定义
 export class LatexHelperView extends ItemView {
+    // ✅ 添加 plugin 引用
     private plugin: LatexHelperPlugin;
     private currentCategory: string;
     private searchTerm: string;
+    private currentLang: 'zh' | 'en' = 'en';
 
+    // ✅ 构造函数接收 plugin
     constructor(leaf: WorkspaceLeaf, plugin: LatexHelperPlugin) {
         super(leaf);
         this.plugin = plugin;
-        this.currentCategory = Object.keys(symbolCategories)[0] || '';
+        // 从设置中获取第一个分类
+        this.currentCategory = Object.keys(this.plugin.settings.symbols)[0] || '';
         this.searchTerm = '';
     }
 
-    // 必须是 public，因为它实现了 ItemView 的公共方法
     getViewType(): string {
         return LATEX_HELPER_VIEW_TYPE;
     }
 
-    // 必须是 public，因为它实现了 ItemView 的公共方法
     getDisplayText(): string {
-        return this.plugin.settings ? this.t("view_title") : "LaTeX Snippets";
+        return this.t("view_title");
     }
 
-    // 翻译辅助函数
+    public refresh() {
+        const container = this.contentEl;
+        // 如果当前分类被删除了，重置为第一个
+        const categories = Object.keys(this.plugin.settings.symbols);
+        if (!categories.includes(this.currentCategory)) {
+            this.currentCategory = categories[0] || '';
+        }
+        this.renderSymbols(container);
+    }
+
+
+    private updateLanguage() {
+        // ... 保持原样 ...
+        let lang: string | null = null;
+        try { lang = getLanguage(); } catch (e) { /* ignore */ }
+        if (!lang && window.moment) { lang = window.moment.locale(); }
+        if (!lang) { lang = window.localStorage.getItem('language'); }
+        if (lang && lang.toLowerCase().startsWith('zh')) { this.currentLang = 'zh'; } 
+        else { this.currentLang = 'en'; }
+    }
+
     private t(key: keyof typeof translations['en']): string {
-        const lang = this.plugin.settings.language;
-        return translations[lang][key] || translations['en'][key];
+        return translations[this.currentLang]?.[key] || translations['en'][key] || key;
     }
-
-    // 获取显示文本的辅助函数
+    
     private getSymbolDisplayText(symbol: SymbolDefinition): string {
         if (typeof symbol.display === 'string') {
             return symbol.display;
         } else {
-            const lang = this.plugin.settings.language;
-            return symbol.display[lang];
+            return symbol.display[this.currentLang] || symbol.display['en'];
         }
     }
 
-    // 必须是 public，因为它实现了 ItemView 的公共方法
     async onOpen() {
+        this.updateLanguage();
         const container = this.contentEl;
         container.empty();
         await Promise.resolve();
@@ -70,45 +83,42 @@ export class LatexHelperView extends ItemView {
         const controlsContainer = container.createDiv({ cls: "latex-controls-container" });
         const topRow = controlsContainer.createDiv({ cls: "latex-top-row" });
         
-        // 搜索框
         const searchInput = topRow.createEl("input", {
             type: "text",
             placeholder: this.t("search_placeholder"),
             cls: "latex-search-input"
         });
 
-        // 弹出/停靠按钮
         const isPopout = this.leaf.getRoot() instanceof WorkspaceWindow;
         const actionButton = topRow.createEl("button", { cls: "latex-action-button" });
 
-        if (isPopout) {
-            setIcon(actionButton, "panel-left-close");
-            actionButton.ariaLabel = this.t("dock_tooltip");
-            actionButton.addEventListener("click", () => {
-                void this.dockView();
-            });
-        } else {
-            setIcon(actionButton, "popup-open");
-            actionButton.ariaLabel = this.t("popout_tooltip");
-            actionButton.addEventListener("click", () => {
-                void this.popoutView();
-            });
-        }
+        const icon = isPopout ? "panel-left-close" : "popup-open";
+        const tooltip = isPopout ? this.t("dock_tooltip") : this.t("popout_tooltip");
+        const action = isPopout ? () => this.dockView() : () => this.popoutView();
+        setIcon(actionButton, icon);
+        actionButton.ariaLabel = tooltip;
+        actionButton.addEventListener("mousedown", (e) => {
+            e.preventDefault();
+            void action();
+        });
         
-        // 分类选择下拉菜单
         const categorySelect = controlsContainer.createEl("select", { cls: "latex-category-select" });
-        const categories = Object.keys(symbolCategories);
+        const categories = Object.keys(this.plugin.settings.symbols);
+        
         categories.forEach(category => {
             const option = categorySelect.createEl("option");
             option.value = category;
-            option.textContent = this.t(category as keyof typeof translations['en']);
+            // 这里需要注意：如果是用户自定义的新分类，翻译文件中没有 key，就直接显示 key 本身
+            option.textContent = this.t(category as TranslationKey); 
         });
 
-        // 事件监听
         categorySelect.addEventListener("change", (e) => {
             this.currentCategory = (e.target as HTMLSelectElement).value;
             this.renderSymbols(container);
         });
+        
+        // 确保下拉框选中当前分类
+        categorySelect.value = this.currentCategory;
 
         searchInput.addEventListener("input", (e) => {
             this.searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
@@ -123,7 +133,7 @@ export class LatexHelperView extends ItemView {
         }
         contentContainer.empty();
 
-        const symbols = symbolCategories[this.currentCategory];
+        const symbols = this.plugin.settings.symbols[this.currentCategory];
         if (!symbols) return;
 
         const filteredSymbols = symbols.filter(symbol => 
@@ -131,37 +141,36 @@ export class LatexHelperView extends ItemView {
         );
 
         const grid = contentContainer.createDiv({ cls: "latex-grid" });
+        
         filteredSymbols.forEach(symbol => {
-            // 根据是否使用翻译添加不同的类名
             const isTranslated = this.currentCategory === 'matrices' || this.currentCategory === 'environments';
+            
             const button = grid.createEl("button", { 
                 cls: `latex-symbol-button ${isTranslated ? 'latex-translated-button' : 'latex-formula-button'}`,
-                attr: {
-                    'data-category': this.currentCategory
-                }
+                attr: { 'data-category': this.currentCategory }
             });
             
             const displayText = this.getSymbolDisplayText(symbol);
 
             if (isTranslated) {
-                // 对于翻译内容，创建一个文本容器
                 const textContainer = button.createDiv({ cls: 'latex-translated-text' });
                 textContainer.setText(displayText);
             } else {
-                // 对于 LaTeX 公式，使用原有的渲染方式
                 void MarkdownRenderer.render(this.app, displayText, button, '', this);
             }
 
-            button.addEventListener("click", () => { 
+            button.addEventListener("mousedown", (e) => { 
+                e.preventDefault(); 
+                e.stopPropagation();
                 this.insertText(symbol.code + ' ');
             });
         });
     }
 
+
     private async popoutView() {
         const newLeaf = this.app.workspace.openPopoutLeaf();
         await newLeaf.setViewState({ type: LATEX_HELPER_VIEW_TYPE, active: true });
-        this.leaf.detach();
     }
 
     private async dockView() {
@@ -169,32 +178,28 @@ export class LatexHelperView extends ItemView {
         if(rightLeaf) {
             await rightLeaf.setViewState({ type: LATEX_HELPER_VIEW_TYPE, active: true });
             await this.app.workspace.revealLeaf(rightLeaf);
-            this.leaf.detach();
+            if (this.leaf.getRoot() instanceof WorkspaceWindow) {
+                this.leaf.detach();
+            }
         }
     }
 
     private insertText(textToInsert: string) {
-        let editor: Editor | null = null;
-        const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
-        if (activeView) {
-            editor = activeView.editor;
-        } else {
-            this.app.workspace.iterateAllLeaves(leaf => {
-                if (editor) return;
-                if (leaf.view instanceof MarkdownView) {
-                    editor = leaf.view.editor;
-                }
-            });
+        let view = this.app.workspace.getActiveViewOfType(MarkdownView);
+        if (!view) {
+            const leaves = this.app.workspace.getLeavesOfType("markdown");
+            if (leaves.length > 0 && leaves[0].view instanceof MarkdownView) {
+                view = leaves[0].view as MarkdownView;
+            }
         }
-
-        if (editor) {
+        if (view) {
+            const editor = view.editor;
+            if (!editor.hasFocus()) editor.focus();
             const cursor = editor.getCursor();
             editor.replaceSelection(textToInsert);
             editor.setCursor(cursor.line, cursor.ch + textToInsert.length);
-            editor.focus();
         }
     }
 
-    // 必须是 public，因为它实现了 ItemView 的公共方法
     async onClose() {}
 }
