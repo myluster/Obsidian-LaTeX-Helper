@@ -76,16 +76,16 @@ export default class LatexHelperPlugin extends Plugin {
     }
 
     onunload() {
-        // Obsidian 会自动处理视图的挂载和卸载状态
+        // Obsidian handles view detachment automatically
     }
 }
 
 class ConfirmModal extends Modal {
     private title: string;
     private content: string;
-    private onConfirm: () => void;
+    private onConfirm: () => void | Promise<void>;
 
-    constructor(app: App, title: string, content: string, onConfirm: () => void) {
+    constructor(app: App, title: string, content: string, onConfirm: () => void | Promise<void>) {
         super(app);
         this.title = title;
         this.content = content;
@@ -106,8 +106,8 @@ class ConfirmModal extends Modal {
             .addButton(btn => btn
                 .setButtonText('Confirm')
                 .setWarning()
-                .onClick(() => {
-                    this.onConfirm();
+                .onClick(async () => {
+                    await this.onConfirm();
                     this.close();
                 }));
     }
@@ -155,7 +155,7 @@ class LatexHelperSettingTab extends PluginSettingTab {
                         const parsed = JSON.parse(value);
                         this.plugin.settings.symbols = parsed;
                         await this.plugin.saveSettings();
-                    } catch (e) {
+                    } catch { 
                         console.warn(this.t('json_error'));
                     }
                 }));

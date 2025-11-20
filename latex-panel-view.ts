@@ -37,7 +37,6 @@ export class LatexHelperView extends ItemView {
 
     private updateLanguage() {
         let lang: string | null = null;
-        
         try { lang = getLanguage(); } catch { /* ignore */ }
         
         if (!lang && moment) { lang = moment.locale(); }
@@ -47,8 +46,9 @@ export class LatexHelperView extends ItemView {
         else { this.currentLang = 'en'; }
     }
 
-    private t(key: keyof typeof translations['en']): string {
-        return translations[this.currentLang]?.[key] || translations['en'][key] || key;
+    private t(str: string): string {
+        const key = str as TranslationKey;
+        return translations[this.currentLang]?.[key] || translations['en'][key] || str;
     }
     
     private getSymbolDisplayText(symbol: SymbolDefinition): string {
@@ -99,7 +99,7 @@ export class LatexHelperView extends ItemView {
         categories.forEach(category => {
             const option = categorySelect.createEl("option");
             option.value = category;
-            option.textContent = this.t(category as TranslationKey); 
+            option.textContent = this.t(category); 
         });
 
         categorySelect.addEventListener("change", (e) => {
