@@ -174,12 +174,15 @@ export class LatexHelperView extends ItemView {
 
     private insertText(textToInsert: string) {
         let view = this.app.workspace.getActiveViewOfType(MarkdownView);
+        
+        // 兜底逻辑：如果 getActiveViewOfType 没获取到，尝试从所有 leaf 中找
         if (!view) {
             const leaves = this.app.workspace.getLeavesOfType("markdown");
             if (leaves.length > 0 && leaves[0].view instanceof MarkdownView) {
-                view = leaves[0].view as MarkdownView;
+                view = leaves[0].view;
             }
         }
+        
         if (view) {
             const editor = view.editor;
             if (!editor.hasFocus()) editor.focus();
