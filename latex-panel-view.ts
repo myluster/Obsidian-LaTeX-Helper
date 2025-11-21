@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, MarkdownView, MarkdownRenderer, setIcon, WorkspaceWindow, getLanguage, moment } from "obsidian";
+import { ItemView, WorkspaceLeaf, MarkdownView, MarkdownRenderer, setIcon, WorkspaceWindow, getLanguage } from "obsidian";
 import { SymbolDefinition } from './symbols';
 import { translations, TranslationKey } from './lang';
 import LatexHelperPlugin from "./main";
@@ -36,14 +36,13 @@ export class LatexHelperView extends ItemView {
     }
 
     private updateLanguage() {
-        let lang: string | null = null;
-        try { lang = getLanguage(); } catch { /* ignore */ }
+        const lang = getLanguage();
         
-        if (!lang && moment) { lang = moment.locale(); }
-        if (!lang) { lang = window.localStorage.getItem('language'); }
-        
-        if (lang && lang.toLowerCase().startsWith('zh')) { this.currentLang = 'zh'; } 
-        else { this.currentLang = 'en'; }
+        if (lang && lang.toLowerCase().startsWith('zh')) { 
+            this.currentLang = 'zh'; 
+        } else { 
+            this.currentLang = 'en'; 
+        }
     }
 
     private t(str: string): string {
@@ -175,7 +174,6 @@ export class LatexHelperView extends ItemView {
     private insertText(textToInsert: string) {
         let view = this.app.workspace.getActiveViewOfType(MarkdownView);
         
-        // 兜底逻辑：如果 getActiveViewOfType 没获取到，尝试从所有 leaf 中找
         if (!view) {
             const leaves = this.app.workspace.getLeavesOfType("markdown");
             if (leaves.length > 0 && leaves[0].view instanceof MarkdownView) {

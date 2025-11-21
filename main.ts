@@ -1,4 +1,4 @@
-import { App, Plugin, PluginSettingTab, Setting, WorkspaceLeaf, Notice, Modal } from 'obsidian';
+import { App, Plugin, PluginSettingTab, Setting, WorkspaceLeaf, Notice, Modal, getLanguage } from 'obsidian';
 import { LatexHelperView, LATEX_HELPER_VIEW_TYPE } from './latex-panel-view';
 import { DEFAULT_SYMBOLS, SymbolDefinition } from './symbols';
 import { translations, TranslationKey } from './lang';
@@ -125,10 +125,9 @@ class LatexHelperSettingTab extends PluginSettingTab {
         super(app, plugin);
         this.plugin = plugin;
     }
-
     private t(key: TranslationKey): string {
-        const lang = window.localStorage.getItem('language') || 'en';
-        const isZh = lang.toLowerCase().startsWith('zh');
+        const lang = getLanguage();
+        const isZh = lang && lang.toLowerCase().startsWith('zh');
         const currentLang = isZh ? 'zh' : 'en';
         return translations[currentLang][key] || translations['en'][key] || key;
     }
@@ -136,10 +135,6 @@ class LatexHelperSettingTab extends PluginSettingTab {
     display(): void {
         const {containerEl} = this;
         containerEl.empty();
-
-        new Setting(containerEl)
-            .setName(this.t('settings_title'))
-            .setHeading();
 
         new Setting(containerEl)
             .setName(this.t('settings_json_name'))
