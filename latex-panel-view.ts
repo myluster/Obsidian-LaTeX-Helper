@@ -175,9 +175,9 @@ export class LatexHelperView extends ItemView {
         let view = this.app.workspace.getActiveViewOfType(MarkdownView);
         
         if (!view) {
-            const leaves = this.app.workspace.getLeavesOfType("markdown");
-            if (leaves.length > 0 && leaves[0].view instanceof MarkdownView) {
-                view = leaves[0].view;
+            const leaf = this.app.workspace.getMostRecentLeaf();
+            if (leaf && leaf.view instanceof MarkdownView) {
+                view = leaf.view;
             }
         }
         
