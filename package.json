@@ -1,6 +1,6 @@
 {
 	"name": "latex-panel-helper",
-	"version": "0.1.1",
+	"version": "1.0.0",
 	"description": "Provides a convenient panel with categorized LaTeX symbols, real-time search, and a pop-out window to enhance your mathematical note-taking efficiency.",
 	"main": "main.js",
 	"scripts": {
