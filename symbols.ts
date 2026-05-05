@@ -7,6 +7,7 @@ export interface SymbolDisplay {
 export interface SymbolDefinition {
     display: string | SymbolDisplay;
     code: string;
+    cursorOffset?: number;
 }
 
 export const DEFAULT_SYMBOLS: Record<string, SymbolDefinition[]> = {
@@ -54,24 +55,40 @@ export const DEFAULT_SYMBOLS: Record<string, SymbolDefinition[]> = {
         { display: "$\\leadsto$", code: "\\leadsto" },
     ],
     "delimiters": [
-        { display: "$()$", code: "()" }, { display: "$[]$", code: "[]" }, { display: "$\\{\\}$", code: "\\{\\}" }, { display: "$||$", code: "||" }, { display: "$\\langle\\rangle$", code: "\\langle\\rangle" },
-        { display: "$\\lfloor\\rfloor$", code: "\\lfloor \\rfloor" }, { display: "$\\lceil\\rceil$", code: "\\lceil \\rceil" }, { display: "$\\vert$", code: "\\vert" }, { display: "$\\Vert$", code: "\\Vert" },
+        { display: "$()$", code: "()", cursorOffset: 1 },
+        { display: "$[]$", code: "[]", cursorOffset: 1 },
+        { display: "$\\{\\}$", code: "\\{\\}", cursorOffset: 2 },
+        { display: "$||$", code: "||", cursorOffset: 1 },
+        { display: "$\\langle\\rangle$", code: "\\langle\\rangle", cursorOffset: 7 },
+        { display: "$\\lfloor\\rfloor$", code: "\\lfloor \\rfloor", cursorOffset: 7 },
+        { display: "$\\lceil\\rceil$", code: "\\lceil \\rceil", cursorOffset: 6 },
+        { display: "$\\vert$", code: "\\vert" },
+        { display: "$\\Vert$", code: "\\Vert" },
         { display: "$\\ulcorner$", code: "\\ulcorner" },
         { display: "$\\urcorner$", code: "\\urcorner" },
         { display: "$\\llcorner$", code: "\\llcorner" },
         { display: "$\\lrcorner$", code: "\\lrcorner" },
-        { display: "$\\uparrow\\downarrow$", code: "\\uparrow\\downarrow" },
+        { display: "$\\uparrow\\downarrow$", code: "\\uparrow\\downarrow", cursorOffset: 8 },
     ],
     "maths_constructs": [
-        { display: "$x^{2}$", code: "^{}" }, { display: "$x_{i}$", code: "_{}" }, { display: "$\\frac{a}{b}$", code: "\\frac{}{}" }, { display: "$\\sqrt{x}$", code: "\\sqrt{}" }, { display: "$\\sqrt[n]{x}$", code: "\\sqrt[]{-}" },
-        { display: "$\\overline{x}$", code: "\\overline{}" }, { display: "$\\vec{x}$", code: "\\vec{}" }, { display: "$\\hat{x}$", code: "\\hat{}" }, { display: "$\\tilde{x}$", code: "\\tilde{}" }, { display: "$\\dot{x}$", code: "\\dot{}" }, { display: "$\\ddot{x}$", code: "\\ddot{}" },
-        { display: "$\\overleftarrow{x}$", code: "\\overleftarrow{}" },
-        { display: "$\\overrightarrow{x}$", code: "\\overrightarrow{}" },
-        { display: "$\\overbrace{x}$", code: "\\overbrace{}" },
-        { display: "$\\underbrace{x}$", code: "\\underbrace{}" },
-        { display: "$\\stackrel{x}{y}$", code: "\\stackrel{}{}" },
-        { display: "$\\overset{x}{y}$", code: "\\overset{}{}" },
-        { display: "$\\underset{x}{y}$", code: "\\underset{}{}" },
+        { display: "$x^{2}$", code: "^{}", cursorOffset: 2 },
+        { display: "$x_{i}$", code: "_{}", cursorOffset: 2 },
+        { display: "$\\frac{a}{b}$", code: "\\frac{}{}", cursorOffset: 6 },
+        { display: "$\\sqrt{x}$", code: "\\sqrt{}", cursorOffset: 6 },
+        { display: "$\\sqrt[n]{x}$", code: "\\sqrt[]{-}", cursorOffset: 6 },
+        { display: "$\\overline{x}$", code: "\\overline{}", cursorOffset: 10 },
+        { display: "$\\vec{x}$", code: "\\vec{}", cursorOffset: 5 },
+        { display: "$\\hat{x}$", code: "\\hat{}", cursorOffset: 5 },
+        { display: "$\\tilde{x}$", code: "\\tilde{}", cursorOffset: 7 },
+        { display: "$\\dot{x}$", code: "\\dot{}", cursorOffset: 5 },
+        { display: "$\\ddot{x}$", code: "\\ddot{}", cursorOffset: 6 },
+        { display: "$\\overleftarrow{x}$", code: "\\overleftarrow{}", cursorOffset: 15 },
+        { display: "$\\overrightarrow{x}$", code: "\\overrightarrow{}", cursorOffset: 16 },
+        { display: "$\\overbrace{x}$", code: "\\overbrace{}", cursorOffset: 11 },
+        { display: "$\\underbrace{x}$", code: "\\underbrace{}", cursorOffset: 12 },
+        { display: "$\\stackrel{x}{y}$", code: "\\stackrel{}{}", cursorOffset: 10 },
+        { display: "$\\overset{x}{y}$", code: "\\overset{}{}", cursorOffset: 9 },
+        { display: "$\\underset{x}{y}$", code: "\\underset{}{}", cursorOffset: 10 },
     ],
     "variable_sized_symbols": [
         { display: "$\\sum$", code: "\\sum" }, { display: "$\\prod$", code: "\\prod" }, { display: "$\\coprod$", code: "\\coprod" }, { display: "$\\int$", code: "\\int" }, { display: "$\\oint$", code: "\\oint" },
@@ -95,11 +112,16 @@ export const DEFAULT_SYMBOLS: Record<string, SymbolDefinition[]> = {
         { display: "$\\arg$", code: "\\arg" },
     ],
     "letter_styles": [
-        { display: "$\\mathbb{A}$", code: "\\mathbb{}" }, { display: "$\\mathcal{A}$", code: "\\mathcal{}" }, { display: "$\\mathfrak{A}$", code: "\\mathfrak{}" }, { display: "$\\mathscr{A}$", code: "\\mathscr{}" }, { display: "$\\mathbf{A}$", code: "\\mathbf{}" }, { display: "$\\mathrm{A}$", code: "\\mathrm{}" },
-        { display: "$\\mathit{A}$", code: "\\mathit{}" },
-        { display: "$\\mathsf{A}$", code: "\\mathsf{}" },
-        { display: "$\\mathtt{A}$", code: "\\mathtt{}" },
-        { display: "$\\boldsymbol{A}$", code: "\\boldsymbol{}" },
+        { display: "$\\mathbb{A}$", code: "\\mathbb{}", cursorOffset: 8 },
+        { display: "$\\mathcal{A}$", code: "\\mathcal{}", cursorOffset: 9 },
+        { display: "$\\mathfrak{A}$", code: "\\mathfrak{}", cursorOffset: 10 },
+        { display: "$\\mathscr{A}$", code: "\\mathscr{}", cursorOffset: 12 },
+        { display: "$\\mathbf{A}$", code: "\\mathbf{}", cursorOffset: 8 },
+        { display: "$\\mathrm{A}$", code: "\\mathrm{}", cursorOffset: 8 },
+        { display: "$\\mathit{A}$", code: "\\mathit{}", cursorOffset: 8 },
+        { display: "$\\mathsf{A}$", code: "\\mathsf{}", cursorOffset: 8 },
+        { display: "$\\mathtt{A}$", code: "\\mathtt{}", cursorOffset: 8 },
+        { display: "$\\boldsymbol{A}$", code: "\\boldsymbol{}", cursorOffset: 12 },
     ],
      "matrices": [
         { 
@@ -107,35 +129,40 @@ export const DEFAULT_SYMBOLS: Record<string, SymbolDefinition[]> = {
                 en: "Basic matrix",
                 zh: "基础矩阵"
             }, 
-            code: "\\begin{matrix}\na & b \\\\\nc & d\n\\end{matrix}"
+            code: "\\begin{matrix}\na & b \\\\\nc & d\n\\end{matrix}",
+            cursorOffset: 15
         },
         { 
             display: {
                 en: "Parentheses matrix",
                 zh: "小括号矩阵"
             }, 
-            code: "\\begin{pmatrix}\na & b \\\\\nc & d\n\\end{pmatrix}"
+            code: "\\begin{pmatrix}\na & b \\\\\nc & d\n\\end{pmatrix}",
+            cursorOffset: 16
         },
         { 
             display: {
                 en: "Bracket matrix",
                 zh: "中括号矩阵"
             }, 
-            code: "\\begin{bmatrix}\na & b \\\\\nc & d\n\\end{bmatrix}"
+            code: "\\begin{bmatrix}\na & b \\\\\nc & d\n\\end{bmatrix}",
+            cursorOffset: 16
         },
         { 
             display: {
                 en: "Single line matrix",
                 zh: "单竖线矩阵"
             }, 
-            code: "\\begin{vmatrix}\na & b \\\\\nc & d\n\\end{vmatrix}"
+            code: "\\begin{vmatrix}\na & b \\\\\nc & d\n\\end{vmatrix}",
+            cursorOffset: 16
         },
         { 
             display: {
                 en: "Double line matrix",
                 zh: "双竖线矩阵"
             }, 
-            code: "\\begin{Vmatrix}\na & b \\\\\nc & d\n\\end{Vmatrix}"
+            code: "\\begin{Vmatrix}\na & b \\\\\nc & d\n\\end{Vmatrix}",
+            cursorOffset: 16
         }
     ],
     "misc": [
@@ -159,28 +186,32 @@ export const DEFAULT_SYMBOLS: Record<string, SymbolDefinition[]> = {
                 en: "Equation",
                 zh: "带编号方程"
             }, 
-            code: "\\begin{equation}\n\n\\end{equation}"
+            code: "\\begin{equation}\n\n\\end{equation}",
+            cursorOffset: 17
         },
         { 
             display: {
                 en: "Align",
                 zh: "对齐方程组"
             }, 
-            code: "\\begin{align}\n\n\\end{align}"
+            code: "\\begin{align}\n\n\\end{align}",
+            cursorOffset: 12
         },
         { 
             display: {
                 en: "Cases",
                 zh: "分段函数"
             }, 
-            code: "\\begin{cases}\n\n\\end{cases}"
+            code: "\\begin{cases}\n\n\\end{cases}",
+            cursorOffset: 14
         },
         { 
             display: {
                 en: "Array",
                 zh: "矩阵数组"
             }, 
-            code: "\\begin{array}{}\n\n\\end{array}"
+            code: "\\begin{array}{}\n\n\\end{array}",
+            cursorOffset: 15
         }
     ]
 };

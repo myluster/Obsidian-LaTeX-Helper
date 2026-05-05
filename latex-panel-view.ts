@@ -1,7 +1,7 @@
 import { ItemView, WorkspaceLeaf, MarkdownView, MarkdownRenderer, setIcon, WorkspaceWindow, getLanguage } from "obsidian";
 import { SymbolDefinition } from './symbols';
 import { translations, TranslationKey } from './lang';
-import LatexHelperPlugin from "./main";
+import type LatexHelperPlugin from "./main";
 
 export const LATEX_HELPER_VIEW_TYPE = "latex-panel-view";
 
@@ -64,6 +64,21 @@ export class LatexHelperView extends ItemView {
         container.empty();
         await Promise.resolve();
         this.setupControls(container);
+
+        this.registerDomEvent(container, 'mousedown', (e: MouseEvent) => {
+            const target = e.target as HTMLElement;
+            const button = target.closest('.latex-symbol-button') as HTMLElement | null;
+            if (button?.dataset.code) {
+                e.preventDefault();
+                e.stopPropagation();
+                const offset = button.dataset.cursorOffset;
+                this.insertText(
+                    button.dataset.code,
+                    offset !== undefined ? parseInt(offset, 10) : undefined
+                );
+            }
+        });
+
         this.renderSymbols(container);
     }
 
@@ -87,7 +102,7 @@ export class LatexHelperView extends ItemView {
         setIcon(actionButton, icon);
         actionButton.ariaLabel = tooltip;
         
-        actionButton.addEventListener("mousedown", (e) => {
+        this.registerDomEvent(actionButton, "mousedown", (e: MouseEvent) => {
             e.preventDefault();
             void action();
         });
@@ -101,14 +116,14 @@ export class LatexHelperView extends ItemView {
             option.textContent = this.t(category); 
         });
 
-        categorySelect.addEventListener("change", (e) => {
+        this.registerDomEvent(categorySelect, "change", (e: Event) => {
             this.currentCategory = (e.target as HTMLSelectElement).value;
             this.renderSymbols(container);
         });
         
         categorySelect.value = this.currentCategory;
 
-        searchInput.addEventListener("input", (e) => {
+        this.registerDomEvent(searchInput, "input", (e: Event) => {
             this.searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
             this.renderSymbols(container);
         });
@@ -147,11 +162,10 @@ export class LatexHelperView extends ItemView {
                 void MarkdownRenderer.render(this.app, displayText, button, '', this);
             }
 
-            button.addEventListener("mousedown", (e) => { 
-                e.preventDefault(); 
-                e.stopPropagation();
-                this.insertText(symbol.code + ' ');
-            });
+            button.setAttr('data-code', symbol.code);
+            if (symbol.cursorOffset !== undefined) {
+                button.setAttr('data-cursor-offset', String(symbol.cursorOffset));
+            }
         });
     }
 
@@ -171,7 +185,7 @@ export class LatexHelperView extends ItemView {
         }
     }
 
-    private insertText(textToInsert: string) {
+    private insertText(code: string, cursorOffset?: number) {
         let view = this.app.workspace.getActiveViewOfType(MarkdownView);
         
         if (!view) {
@@ -185,8 +199,27 @@ export class LatexHelperView extends ItemView {
             const editor = view.editor;
             if (!editor.hasFocus()) editor.focus();
             const cursor = editor.getCursor();
+            const startCh = cursor.ch;
+
+            let textToInsert: string;
+            let finalOffset: number;
+
+            if (cursorOffset !== undefined) {
+                textToInsert = code;
+                if (cursorOffset <= code.length) {
+                    finalOffset = cursorOffset;
+                } else {
+                    const pad = ' '.repeat(cursorOffset - code.length);
+                    textToInsert = code + pad;
+                    finalOffset = cursorOffset;
+                }
+            } else {
+                textToInsert = code + ' ';
+                finalOffset = code.length + 1;
+            }
+
             editor.replaceSelection(textToInsert);
-            editor.setCursor(cursor.line, cursor.ch + textToInsert.length);
+            editor.setCursor(cursor.line, startCh + finalOffset);
         }
     }
 

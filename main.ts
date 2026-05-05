@@ -62,7 +62,35 @@ export default class LatexHelperPlugin extends Plugin {
     }
 
     async loadSettings() {
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+        const saved = await this.loadData() as Partial<LatexHelperSettings> | null;
+        const merged: LatexHelperSettings = { symbols: {} };
+        
+        for (const category of Object.keys(DEFAULT_SYMBOLS)) {
+            const defaultSymbols = DEFAULT_SYMBOLS[category];
+            const savedSymbols = saved?.symbols?.[category];
+            
+            if (savedSymbols) {
+                merged.symbols[category] = savedSymbols.map((savedSym, i) => {
+                    const defaults = defaultSymbols[i];
+                    if (defaults && defaults.code === savedSym.code) {
+                        return { ...defaults, ...savedSym };
+                    }
+                    return savedSym;
+                });
+            } else {
+                merged.symbols[category] = defaultSymbols;
+            }
+        }
+        
+        if (saved?.symbols) {
+            for (const category of Object.keys(saved.symbols)) {
+                if (!merged.symbols[category]) {
+                    merged.symbols[category] = saved.symbols[category];
+                }
+            }
+        }
+
+        this.settings = merged;
     }
 
     async saveSettings() {

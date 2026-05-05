@@ -27,7 +27,7 @@ export const translations: Record<'en' | 'zh', Record<TranslationKey, string>> =
         "environments": "Environments",
         
         "settings_json_name": "Symbol configuration (JSON)", 
-        "settings_json_desc": "Edit the JSON below to customize symbols. Be careful with the syntax!",
+        "settings_json_desc": "Edit the JSON below to customize symbols. Each symbol can have an optional \"cursorOffset\" field: the character position where the cursor lands after insertion. If the offset exceeds the code length, spaces will be padded. If omitted, defaults to inserting a trailing space. Example: { \"display\": \"$\\frac{a}{b}$\", \"code\": \"\\frac{}{}\", \"cursorOffset\": 6 } — cursor lands inside the first {}.",
         "settings_reset_name": "Reset to defaults",
         "settings_reset_desc": "Restore original symbol list. This will overwrite your changes.",
         "settings_reset_btn": "Reset",
@@ -53,7 +53,7 @@ export const translations: Record<'en' | 'zh', Record<TranslationKey, string>> =
         "environments": "数学环境",
         
         "settings_json_name": "符号配置 (JSON)",
-        "settings_json_desc": "在下方编辑 JSON 以自定义符号。请注意保持语法格式正确！",
+        "settings_json_desc": "在下方编辑 JSON 以自定义符号。每个符号可添加可选字段 \"cursorOffset\"：插入后光标停留的字符位置。若偏移量超出代码长度则自动补空格；若不填则默认末尾加空格。示例：{ \"display\": \"$\\frac{a}{b}$\", \"code\": \"\\frac{}{}\", \"cursorOffset\": 6 } — 光标停留在第一个 {} 内部。",
         "settings_reset_name": "重置为默认",
         "settings_reset_desc": "恢复初始符号列表。这将覆盖您的所有更改。",
         "settings_reset_btn": "重置",
