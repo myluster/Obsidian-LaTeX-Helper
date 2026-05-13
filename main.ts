@@ -3,14 +3,8 @@ import { LatexHelperView, LATEX_HELPER_VIEW_TYPE } from './latex-panel-view';
 import { DEFAULT_SYMBOLS, SymbolDefinition } from './symbols';
 import { translations, TranslationKey } from './lang';
 
-// 定义设置接口
 export interface LatexHelperSettings {
     symbols: Record<string, SymbolDefinition[]>;
-}
-
-// 默认设置
-const DEFAULT_SETTINGS: LatexHelperSettings = {
-    symbols: DEFAULT_SYMBOLS
 }
 
 export default class LatexHelperPlugin extends Plugin {

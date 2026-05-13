@@ -67,7 +67,7 @@ export class LatexHelperView extends ItemView {
 
         this.registerDomEvent(container, 'mousedown', (e: MouseEvent) => {
             const target = e.target as HTMLElement;
-            const button = target.closest('.latex-symbol-button') as HTMLElement | null;
+            const button = target.closest<HTMLElement>('.latex-symbol-button');
             if (button?.dataset.code) {
                 e.preventDefault();
                 e.stopPropagation();
