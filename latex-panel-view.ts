@@ -1,6 +1,6 @@
-import { ItemView, WorkspaceLeaf, MarkdownView, MarkdownRenderer, setIcon, WorkspaceWindow, getLanguage } from "obsidian";
+import { ItemView, WorkspaceLeaf, MarkdownView, MarkdownRenderer, setIcon } from "obsidian";
 import { SymbolDefinition } from './symbols';
-import { translations, TranslationKey } from './lang';
+import { TranslationKey, getCurrentLang, t } from './lang';
 import type LatexHelperPlugin from "./main";
 
 export const LATEX_HELPER_VIEW_TYPE = "latex-panel-view";
@@ -9,13 +9,15 @@ export class LatexHelperView extends ItemView {
     private plugin: LatexHelperPlugin;
     private currentCategory: string;
     private searchTerm: string;
-    private currentLang: 'zh' | 'en' = 'en';
+    private isPopout: boolean;
+    private actionButtonEl!: HTMLElement;
 
     constructor(leaf: WorkspaceLeaf, plugin: LatexHelperPlugin) {
         super(leaf);
         this.plugin = plugin;
         this.currentCategory = Object.keys(this.plugin.settings.symbols)[0] || '';
         this.searchTerm = '';
+        this.isPopout = false;
     }
 
     getViewType(): string {
@@ -23,7 +25,7 @@ export class LatexHelperView extends ItemView {
     }
 
     getDisplayText(): string {
-        return this.t("view_title");
+        return t("view_title");
     }
 
     public refresh() {
@@ -35,31 +37,27 @@ export class LatexHelperView extends ItemView {
         this.renderSymbols(container);
     }
 
-    private updateLanguage() {
-        const lang = getLanguage();
-        
-        if (lang && lang.toLowerCase().startsWith('zh')) { 
-            this.currentLang = 'zh'; 
-        } else { 
-            this.currentLang = 'en'; 
+    public updateActionButtonUI() {
+        if (!this.actionButtonEl) return;
+        if (this.isPopout) {
+            setIcon(this.actionButtonEl, "panel-left-close");
+            this.actionButtonEl.ariaLabel = t("dock_tooltip");
+        } else {
+            setIcon(this.actionButtonEl, "popup-open");
+            this.actionButtonEl.ariaLabel = t("popout_tooltip");
         }
     }
 
-    private t(str: string): string {
-        const key = str as TranslationKey;
-        return translations[this.currentLang]?.[key] || translations['en'][key] || str;
-    }
-    
     private getSymbolDisplayText(symbol: SymbolDefinition): string {
         if (typeof symbol.display === 'string') {
             return symbol.display;
         } else {
-            return symbol.display[this.currentLang] || symbol.display['en'];
+            const lang = getCurrentLang();
+            return symbol.display[lang] || symbol.display['en'];
         }
     }
 
     async onOpen() {
-        this.updateLanguage();
         const container = this.contentEl;
         container.empty();
         await Promise.resolve();
@@ -88,23 +86,20 @@ export class LatexHelperView extends ItemView {
         
         const searchInput = topRow.createEl("input", {
             type: "text",
-            placeholder: this.t("search_placeholder"),
+            placeholder: t("search_placeholder"),
             cls: "latex-search-input"
         });
 
-        const isPopout = this.leaf.getRoot() instanceof WorkspaceWindow;
-        const actionButton = topRow.createEl("button", { cls: "latex-action-button" });
-
-        const icon = isPopout ? "panel-left-close" : "popup-open";
-        const tooltip = isPopout ? this.t("dock_tooltip") : this.t("popout_tooltip");
-        const action = isPopout ? () => this.dockView() : () => this.popoutView();
+        this.actionButtonEl = topRow.createEl("button", { cls: "latex-action-button" });
+        this.updateActionButtonUI();
         
-        setIcon(actionButton, icon);
-        actionButton.ariaLabel = tooltip;
-        
-        this.registerDomEvent(actionButton, "mousedown", (e: MouseEvent) => {
+        this.registerDomEvent(this.actionButtonEl, "mousedown", (e: MouseEvent) => {
             e.preventDefault();
-            void action();
+            if (this.isPopout) {
+                void this.dockView();
+            } else {
+                void this.popoutView();
+            }
         });
         
         const categorySelect = controlsContainer.createEl("select", { cls: "latex-category-select" });
@@ -113,7 +108,7 @@ export class LatexHelperView extends ItemView {
         categories.forEach(category => {
             const option = categorySelect.createEl("option");
             option.value = category;
-            option.textContent = this.t(category); 
+            option.textContent = t(category as TranslationKey); 
         });
 
         this.registerDomEvent(categorySelect, "change", (e: Event) => {
@@ -172,55 +167,67 @@ export class LatexHelperView extends ItemView {
     private async popoutView() {
         const newLeaf = this.app.workspace.openPopoutLeaf();
         await newLeaf.setViewState({ type: LATEX_HELPER_VIEW_TYPE, active: true });
+        const newView = newLeaf.view as LatexHelperView;
+        newView.isPopout = true;
+        newView.updateActionButtonUI();
+        this.leaf.detach();
     }
 
     private async dockView() {
         const rightLeaf = this.app.workspace.getRightLeaf(false);
         if(rightLeaf) {
             await rightLeaf.setViewState({ type: LATEX_HELPER_VIEW_TYPE, active: true });
+            const newView = rightLeaf.view as LatexHelperView;
+            newView.isPopout = false;
+            newView.updateActionButtonUI();
             await this.app.workspace.revealLeaf(rightLeaf);
-            if (this.leaf.getRoot() instanceof WorkspaceWindow) {
-                this.leaf.detach();
-            }
+            this.leaf.detach();
         }
     }
 
     private insertText(code: string, cursorOffset?: number) {
-        let view = this.app.workspace.getActiveViewOfType(MarkdownView);
+        const view = this.plugin.lastActiveMarkdownView;
         
         if (!view) {
-            const leaf = this.app.workspace.getMostRecentLeaf();
-            if (leaf && leaf.view instanceof MarkdownView) {
-                view = leaf.view;
+            const markdownLeaves = this.app.workspace.getLeavesOfType('markdown');
+            if (markdownLeaves.length > 0) {
+                return this.insertTextFallback(code, cursorOffset, markdownLeaves[0].view as MarkdownView);
             }
+            return;
         }
         
-        if (view) {
-            const editor = view.editor;
-            if (!editor.hasFocus()) editor.focus();
-            const cursor = editor.getCursor();
-            const startCh = cursor.ch;
+        this.doInsertText(view, code, cursorOffset);
+    }
 
-            let textToInsert: string;
-            let finalOffset: number;
+    private doInsertText(view: MarkdownView, code: string, cursorOffset?: number) {
+        const editor = view.editor;
+        if (!editor.hasFocus()) editor.focus();
+        const cursor = editor.getCursor();
+        const startCh = cursor.ch;
 
-            if (cursorOffset !== undefined) {
-                textToInsert = code;
-                if (cursorOffset <= code.length) {
-                    finalOffset = cursorOffset;
-                } else {
-                    const pad = ' '.repeat(cursorOffset - code.length);
-                    textToInsert = code + pad;
-                    finalOffset = cursorOffset;
-                }
+        let textToInsert: string;
+        let finalOffset: number;
+
+        if (cursorOffset !== undefined) {
+            textToInsert = code;
+            if (cursorOffset <= code.length) {
+                finalOffset = cursorOffset;
             } else {
-                textToInsert = code + ' ';
-                finalOffset = code.length + 1;
+                const pad = ' '.repeat(cursorOffset - code.length);
+                textToInsert = code + pad;
+                finalOffset = cursorOffset;
             }
-
-            editor.replaceSelection(textToInsert);
-            editor.setCursor(cursor.line, startCh + finalOffset);
+        } else {
+            textToInsert = code + ' ';
+            finalOffset = code.length + 1;
         }
+
+        editor.replaceSelection(textToInsert);
+        editor.setCursor(cursor.line, startCh + finalOffset);
+    }
+
+    private insertTextFallback(code: string, cursorOffset: number | undefined, view: MarkdownView) {
+        this.doInsertText(view, code, cursorOffset);
     }
 
     async onClose() {}

@@ -123,7 +123,7 @@ export const DEFAULT_SYMBOLS: Record<string, SymbolDefinition[]> = {
         { display: "$\\mathtt{A}$", code: "\\mathtt{}", cursorOffset: 8 },
         { display: "$\\boldsymbol{A}$", code: "\\boldsymbol{}", cursorOffset: 12 },
     ],
-     "matrices": [
+    "matrices": [
         { 
             display: {
                 en: "Basic matrix",

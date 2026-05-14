@@ -1,7 +1,7 @@
-import { App, Plugin, PluginSettingTab, Setting, WorkspaceLeaf, Notice, Modal, getLanguage } from 'obsidian';
+import { App, Plugin, PluginSettingTab, Setting, WorkspaceLeaf, Notice, Modal, MarkdownView } from 'obsidian';
 import { LatexHelperView, LATEX_HELPER_VIEW_TYPE } from './latex-panel-view';
 import { DEFAULT_SYMBOLS, SymbolDefinition } from './symbols';
-import { translations, TranslationKey } from './lang';
+import { t } from './lang';
 
 export interface LatexHelperSettings {
     symbols: Record<string, SymbolDefinition[]>;
@@ -9,6 +9,7 @@ export interface LatexHelperSettings {
 
 export default class LatexHelperPlugin extends Plugin {
     settings: LatexHelperSettings;
+    lastActiveMarkdownView: MarkdownView | null = null;
 
     async onload() {
         await this.loadSettings();
@@ -16,6 +17,14 @@ export default class LatexHelperPlugin extends Plugin {
         this.registerView(
             LATEX_HELPER_VIEW_TYPE,
             (leaf) => new LatexHelperView(leaf, this)
+        );
+
+        this.registerEvent(
+            this.app.workspace.on('active-leaf-change', (leaf) => {
+                if (leaf?.view instanceof MarkdownView) {
+                    this.lastActiveMarkdownView = leaf.view;
+                }
+            })
         );
 
         this.addCommand({
@@ -147,20 +156,13 @@ class LatexHelperSettingTab extends PluginSettingTab {
         super(app, plugin);
         this.plugin = plugin;
     }
-    private t(key: TranslationKey): string {
-        const lang = getLanguage();
-        const isZh = lang && lang.toLowerCase().startsWith('zh');
-        const currentLang = isZh ? 'zh' : 'en';
-        return translations[currentLang][key] || translations['en'][key] || key;
-    }
-
     display(): void {
         const {containerEl} = this;
         containerEl.empty();
 
         new Setting(containerEl)
-            .setName(this.t('settings_json_name'))
-            .setDesc(this.t('settings_json_desc'));
+            .setName(t('settings_json_name'))
+            .setDesc(t('settings_json_desc'));
 
         new Setting(containerEl)
             .setClass('latex-helper-json-textarea') 
@@ -173,26 +175,26 @@ class LatexHelperSettingTab extends PluginSettingTab {
                         this.plugin.settings.symbols = parsed;
                         await this.plugin.saveSettings();
                     } catch { 
-                        console.warn(this.t('json_error'));
+                        console.warn(t('json_error'));
                     }
                 }));
 
         new Setting(containerEl)
-            .setName(this.t('settings_reset_name'))
-            .setDesc(this.t('settings_reset_desc'))
+            .setName(t('settings_reset_name'))
+            .setDesc(t('settings_reset_desc'))
             .addButton(button => button
-                .setButtonText(this.t('settings_reset_btn'))
+                .setButtonText(t('settings_reset_btn'))
                 .setWarning()
                 .onClick(() => {
                     new ConfirmModal(
                         this.app, 
-                        this.t('settings_reset_name'),
-                        this.t('settings_reset_confirm'),
+                        t('settings_reset_name'),
+                        t('settings_reset_confirm'),
                         async () => {
                             this.plugin.settings.symbols = DEFAULT_SYMBOLS;
                             await this.plugin.saveSettings();
                             this.display();
-                            new Notice(this.t('settings_reset_success'));
+                            new Notice(t('settings_reset_success'));
                         }
                     ).open();
                 }));
